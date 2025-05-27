@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AppEncuestas</string>
+
+    <!-- Main Page -->
+    <string name="current_streak">Current Streak</string>
+    <string name="today_button">Today I have</string>
+    <string name="activity_completed">Completed!</string>
+    <string name="placeholder_user">Enter username…</string>
+    <string name="username_limit_exceeded">Username cannot exceed %d characters</string>
+    <string name="confirm_username_title">Confirm Username</string>
+    <string name="confirm_username_message">Are you sure you want to use \"%1$s\"?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="skip">Skip</string>
+
+    <!-- Navigation Bar -->
+    <string name="statistics">Statistics</string>
+    <string name="rewards">Rewards</string>
+    <string name="home">Home</string>
+
+    <!-- Options -->
+    <string name="settings_language_english" translatable="false">English</string>
+    <string name="settings_language_spanish" translatable="false">Español</string>
+    <string name="settings_theme_light">Light Theme</string>
+    <string name="settings_theme_dark">Dark Theme</string>
+    <string name="settings_languages">Languages</string>
+    <string name="settings_themes">Themes</string>
+
+    <!-- Month Names -->
+    <string-array name="custom_months">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+
+    <!-- Weekday Names -->
+    <string-array name="custom_weekdays">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
+
+    <!-- Notifications -->
+    <string name="daily_reminder_title">You still have time!</string>
+    <string name="daily_reminder_message">Record your progress before midnight to maintain your streak.</string>
+
+    <string name="streak_broken_title">Streak Broken!</string>
+    <string name="streak_broken_message">Don\'t worry, you can start a new streak today.</string>
+
+    <string name="long_inactive_title">We miss you</string>
+    <string name="long_inactive_message">It\'s been a while since you recorded your progress. Come back whenever you want!</string>
+
+    <!-- Statistics -->
+    <string name="statistics_title">Statistics</string>
+    <string name="statistics_username_label">Username</string>
+    <!-- Statistics Activity -->
+    <string name="level_format">Level %d</string>
+    <string name="experience_format">%d/%d XP</string>
+    <string name="total_surveys_format">Total Surveys Completed: %d</string>
+    <string name="total_experience_format">Total Experience Earned: %d</string>
+    <string name="error_saving_data">Error saving data. Please try again.</string>
+    <string name="no_rewards_yet">No rewards yet</string>
+
+    <!-- Rewards -->
+
+    <!-- Survey Questions -->
+    <string name="survey_satisfaction_title">Satisfaction Survey</string>
+    <string name="survey_satisfaction_description">Help us improve our services</string>
+    <string name="survey_satisfaction_q1">How do you like the app interface?</string>
+    <string name="survey_satisfaction_q2">How often do you use the app?</string>
+    <string name="survey_satisfaction_q2_option1">Daily</string>
+    <string name="survey_satisfaction_q2_option2">Weekly</string>
+    <string name="survey_satisfaction_q2_option3">Monthly</string>
+    <string name="survey_satisfaction_q2_option4">Rarely</string>
+    <string name="survey_satisfaction_q3">What features would you like to see in future updates?</string>
+
+    <string name="survey_products_title">Product Survey</string>
+    <string name="survey_products_description">Tell us about your favorite products</string>
+    <string name="survey_products_q1">What type of products do you prefer?</string>
+    <string name="survey_products_q1_option1">Technology</string>
+    <string name="survey_products_q1_option2">Clothing</string>
+    <string name="survey_products_q1_option3">Food</string>
+    <string name="survey_products_q1_option4">Home</string>
+    <string name="survey_products_q1_option5">Others</string>
+    <string name="survey_products_q2">How much are you willing to spend on monthly purchases?</string>
+    <string name="survey_products_q2_option1">Less than $100</string>
+    <string name="survey_products_q2_option2">$100-$500</string>
+    <string name="survey_products_q2_option3">$500-$1000</string>
+    <string name="survey_products_q2_option4">More than $1000</string>
+
+    <string name="survey_experience_title">Experience Survey</string>
+    <string name="survey_experience_description">Share your experience with us</string>
+    <string name="survey_experience_q1">What motivated you to use our app?</string>
+    <string name="survey_experience_q2">How satisfied are you with the reward system?</string>
+    <string name="survey_experience_q3">Would you recommend the app to others?</string>
+    <string name="survey_experience_q3_option1">Definitely yes</string>
+    <string name="survey_experience_q3_option2">Probably yes</string>
+    <string name="survey_experience_q3_option3">Not sure</string>
+    <string name="survey_experience_q3_option4">Probably not</string>
+    <string name="survey_experience_q3_option5">Definitely not</string>
+
+    <!-- Level Up Screen -->
+    <string name="level_up_title">Level %d Reached!</string>
+    <string name="level_up_message">You earned %d XP</string>
+    <string name="level_up_next_reward">Next reward: %s</string>
+    <string name="level_up_tap_to_continue">Tap to continue</string>
+
+    <!-- Experience Rewards -->
+    <string name="reward_novice_title">🎯 Novice</string>
+    <string name="reward_novice_description">Completed your first survey</string>
+    <string name="reward_explorer_title">🔍 Explorer</string>
+    <string name="reward_explorer_description">Completed 5 surveys</string>
+    <string name="reward_enthusiast_title">🌟 Enthusiast</string>
+    <string name="reward_enthusiast_description">Completed 10 surveys</string>
+    <string name="reward_expert_title">🎓 Expert</string>
+    <string name="reward_expert_description">Completed 15 surveys</string>
+    <string name="reward_master_title">👑 Master</string>
+    <string name="reward_master_description">Completed 20 surveys</string>
+    <string name="reward_legend_title">⚡ Legend</string>
+    <string name="reward_legend_description">Completed 25 surveys</string>
+
+    <!-- Survey UI -->
+    <string name="survey_submit">Submit Survey</string>
+    <string name="survey_answer_hint">Your answer</string>
+    <string name="survey_completed">Survey completed! You earned %d XP</string>
+    <string name="survey_level_required">You need to be level %d to complete this survey</string>
+    <string name="survey_answer_all">Please answer all questions</string>
+    <string name="survey_reward">Reward: %d XP (Level %d required)</string>
+
+    <!-- Reward System -->
+    <string name="current_level">Level %d</string>
+    <string name="next_reward">Next reward: %s</string>
+
+    <!-- Statisticss Activity -->
+    <string name="statistics_card_title">Statistics</string>
+    <string name="statistics_level_default">Level 1</string>
+    <string name="statistics_experience_default">0/100 XP</string>
+    <string name="statistics_total_surveys_default">Total Surveys Completed: 0</string>
+
+    <string name="change_profile_picture">Change profile picture</string>
+    <string name="take_photo">Take photo</string>
+    <string name="choose_from_gallery">Choose from gallery</string>
+
+    <string name="change_username">Change username</string>
+    <string name="view_data_usage">View data usage</string>
+    <string name="logout">Log out</string>
+    <string name="delete_account">Delete account</string>
+    <string name="delete_account_warning">Are you sure? This action is irreversible and will delete your account forever.</string>
+    <string name="delete_forever">Delete forever</string>
+    <string name="account_deleted">Account deleted</string>
+    <string name="error_deleting_account">Error deleting account</string>
+
+    <!-- Login and Registration -->
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="continue_without_login">Continue without login</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="enter_email_for_reset">Enter your email to reset your password</string>
+    <string name="reset_email_sent">Password reset email has been sent</string>
+    <string name="error_reset_password">Error sending reset email</string>
+    <string name="google_sign_in_failed">Google sign in failed</string>
+    <string name="non_authorized_user">Non-authorized user</string>
+
+    <string name="error_email_required">Email is required</string>
+    <string name="error_email_invalid">Enter a valid email</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_password_length">Password must be at least 6 characters</string>
+    <string name="error_confirm_password_required">Confirm password is required</string>
+    <string name="error_passwords_do_not_match">Passwords do not match</string>
+    <string name="registration_successful">Registration Successful.</string>
+    <string name="authentication_failed">Authentication failed: %1$s</string>
+    <string name="enter_username_hint">Enter username</string>
+
+
+    <string name="error_saving_user_data">Error updating your profile. Please try again.</string>
+    <string name="error_fetching_user_data">Error fetching your profile. Please try again.</string>
+    <string name="survey_completed_user_update_failed">Survey recorded! +%1$d XP. (Profile update encountered an issue)</string>
+
+    <string name="error_questions_not_loaded">Error: Questions not loaded.</string>
+    <string name="error_could_not_load_survey_questions">Error: Could not load survey questions.</string>
+    <string name="error_failed_to_init_questions_adapter">Error: Failed to initialize questions adapter.</string>
+    <string name="error_collecting_answers_data_mismatch">Error collecting answers due to data mismatch.</string>
+    <string name="error_processing_answers">Error processing answers.</string>
+    <string name="error_survey_id_missing">Error: Survey ID is missing.</string>
+    <string name="error_user_profile_not_found_for_reward">Error: User profile not found for reward.</string>
+    <string name="error_processing_user_profile_for_reward">Error processing user profile for reward.</string>
+    <string name="submitting_survey">Submitting survey...</string>
+
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="already_have_account_login">Already have an account? Login here.</string>
+    <string name="dont_have_account_register">Don\'t have an account? Register here.</string>
+    <string name="theme_toggle">Toggle theme</string>
+
+    <!-- Shop Section -->
+    <string name="currency_title">Gems:</string>
+    <string name="rewards_section_title">Your Rewards</string>
+    <string name="shop_section_title">Shop</string>
+    <string name="shop_item_avatar">Avatar</string>
+    <string name="shop_item_frame">Frame</string>
+    <string name="shop_item_price">%d Gems</string>
+    <string name="shop_item_purchased">Purchased</string>
+    <string name="shop_item_buy">Buy</string>
+    <string name="shop_item_equip">Equip</string>
+    <string name="shop_item_equipped">Equipped</string>
+    <string name="shop_item_insufficient_funds">Insufficient Gems</string>
+    <string name="shop_item_purchase_success">Purchase Successful!</string>
+    <string name="shop_item_equip_success">Item Equipped!</string>
+    <string name="reward_currency_earned">+%d Gems</string>
+    <string name="login_required_shop">You must be logged in to purchase from the shop.</string>
+    <string name="login_required_equip">You must be logged in to equip shop items.</string>
+
+    <!-- Rewards -->
+    <string name="next_reward_format">Next Reward: %s</string>
+    <string name="level_required">Level %d</string>
+    <string name="all_rewards_claimed">All rewards claimed!</string>
+    <string name="reward_icon_description">Reward icon</string>
+    <string name="reward_achieved_description">Reward achieved</string>
+
+    <!-- Shop Item Strings -->
+    <string name="shop_item_avatar1_title">Basic Avatar</string>
+    <string name="shop_item_avatar1_description">A simple but stylish avatar</string>
+    <string name="shop_item_avatar2_title">Basic Avatar 2</string>
+    <string name="shop_item_avatar2_description">A premium avatar with special effects</string>
+    <string name="shop_item_avatar3_title">Epic Avatar</string>
+    <string name="shop_item_avatar3_description">A premium avatar with special effects</string>
+    <string name="shop_item_avatar4_title">Legendary Avatar</string>
+    <string name="shop_item_avatar4_description">An exclusive legendary avatar</string>
+    <string name="shop_item_frame1_title">Bronze Frame</string>
+    <string name="shop_item_frame1_description">A simple frame for your avatar</string>
+    <string name="shop_item_frame2_title">Silver Frame</string>
+    <string name="shop_item_frame2_description">A premium frame with special effects</string>
+    <string name="shop_item_frame3_title">Legendary Frame</string>
+    <string name="shop_item_frame3_description">An exclusive legendary frame</string>
+
+</resources>

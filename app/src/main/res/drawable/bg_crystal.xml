@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/bg_crystal.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo semi-transparente base-->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#26FFFFFF"/>
+        </shape>
+    </item>
+
+    <!-- Gradiente sutil estilo cristal-->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="45"
+                android:centerColor="#33FFFFFF"
+                android:endColor="#1AFFFFFF"
+                android:type="linear"
+                android:startColor="#40FFFFFF" />
+
+        </shape>
+    </item>
+
+    <!-- Brillo de detalle -->
+    <item android:top="0dp" android:left="0dp" android:right="0dp" android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="#11FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:type="linear" />
+        </shape>
+    </item>
+</layer-list>

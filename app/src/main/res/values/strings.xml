@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AppEncuestas</string>
+
+    <!-- Página principal -->
+    <string name="current_streak">Racha actual</string>
+    <string name="today_button">¡Hoy he</string>
+    <string name="activity_completed">¡Completado!</string>
+    <string name="placeholder_user">Introducir usuario…</string>
+    <string name="username_limit_exceeded">Nombre de usuario no puede exceder %d caracteres</string>
+    <string name="confirm_username_title">Confirmar Usuario</string>
+    <string name="confirm_username_message">Estás seguro de que quieres usar \"%1$s\"?</string>
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
+    <string name="skip">Saltar</string>
+
+    <!-- Barra de navegación -->
+    <string name="statistics">Estadísticas</string>
+    <string name="rewards">Recompensas</string>
+    <string name="home">Página principal</string>
+
+    <!-- Opciones -->
+    <string name="settings_language_english" translatable="false">English</string>
+    <string name="settings_language_spanish" translatable="false">Español</string>
+    <string name="settings_theme_light">Tema claro</string>
+    <string name="settings_theme_dark">Tema oscuro</string>
+    <string name="settings_languages">Idiomas</string>
+    <string name="settings_themes">Temas</string>
+
+    <!-- Personalización de los nombres de los meses -->
+    <string-array name="custom_months">
+        <item>Enero</item>
+        <item>Febrero</item>
+        <item>Marzo</item>
+        <item>Abril</item>
+        <item>Mayo</item>
+        <item>Junio</item>
+        <item>Julio</item>
+        <item>Agosto</item>
+        <item>Septiembre</item>
+        <item>Octubre</item>
+        <item>Noviembre</item>
+        <item>Diciembre</item>
+    </string-array>
+
+    <!-- Personalización de los nombres de los días de la semana -->
+    <string-array name="custom_weekdays">
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Mié</item>
+        <item>Jue</item>
+        <item>Vie</item>
+        <item>Sáb</item>
+        <item>Dom</item>
+    </string-array>
+
+    <!-- Notificaciones -->
+    <string name="daily_reminder_title">¡Aún tienes tiempo!</string>
+    <string name="daily_reminder_message">Registra tu progreso antes de medianoche para mantener tu racha.</string>
+
+    <string name="streak_broken_title">¡Racha rota!</string>
+    <string name="streak_broken_message">No te preocupes, puedes empezar una nueva racha hoy mismo.</string>
+
+    <string name="long_inactive_title">Te echamos de menos</string>
+    <string name="long_inactive_message">Ha pasado tiempo sin registrar tu progreso. ¡Vuelve cuando quieras!</string>
+
+    <!-- Estadísticas -->
+    <string name="statistics_title">Estadísticas</string>
+    <string name="statistics_username_label">Nombre de usuario</string>
+    <!-- Statistics Activity -->
+    <string name="level_format">Level %d</string>
+    <string name="experience_format">%d/%d XP</string>
+    <string name="total_surveys_format">Total de encuestas completadas: %d</string>
+    <string name="total_experience_format">Experiencia total ganada: %d</string>
+    <string name="error_saving_data">Error al guardar los datos. Por favor, inténtalo de nuevo.</string>
+    <string name="no_rewards_yet">Aún no tienes recompensas</string>
+
+    <!-- Survey Questions -->
+    <string name="survey_satisfaction_title">Encuesta de Satisfacción</string>
+    <string name="survey_satisfaction_description">Ayúdanos a mejorar nuestros servicios</string>
+    <string name="survey_satisfaction_q1">¿Qué te parece la interfaz de la aplicación?</string>
+    <string name="survey_satisfaction_q2">¿Con qué frecuencia usas la aplicación?</string>
+    <string name="survey_satisfaction_q2_option1">Diariamente</string>
+    <string name="survey_satisfaction_q2_option2">Semanalmente</string>
+    <string name="survey_satisfaction_q2_option3">Mensualmente</string>
+    <string name="survey_satisfaction_q2_option4">Raramente</string>
+    <string name="survey_satisfaction_q3">¿Qué características te gustaría ver en futuras actualizaciones?</string>
+
+    <string name="survey_products_title">Encuesta de Productos</string>
+    <string name="survey_products_description">Cuéntanos sobre tus productos favoritos</string>
+    <string name="survey_products_q1">¿Qué tipo de productos prefieres?</string>
+    <string name="survey_products_q1_option1">Tecnología</string>
+    <string name="survey_products_q1_option2">Ropa</string>
+    <string name="survey_products_q1_option3">Alimentos</string>
+    <string name="survey_products_q1_option4">Hogar</string>
+    <string name="survey_products_q1_option5">Otros</string>
+    <string name="survey_products_q2">¿Cuánto estás dispuesto a gastar en tus compras mensuales?</string>
+    <string name="survey_products_q2_option1">Menos de $100</string>
+    <string name="survey_products_q2_option2">$100-$500</string>
+    <string name="survey_products_q2_option3">$500-$1000</string>
+    <string name="survey_products_q2_option4">Más de $1000</string>
+
+    <string name="survey_experience_title">Encuesta de Experiencia</string>
+    <string name="survey_experience_description">Comparte tu experiencia con nosotros</string>
+    <string name="survey_experience_q1">¿Qué te motivó a usar nuestra aplicación?</string>
+    <string name="survey_experience_q2">¿Qué tan satisfecho estás con el sistema de recompensas?</string>
+    <string name="survey_experience_q3">¿Recomendarías la aplicación a otros?</string>
+    <string name="survey_experience_q3_option1">Definitivamente sí</string>
+    <string name="survey_experience_q3_option2">Probablemente sí</string>
+    <string name="survey_experience_q3_option3">No estoy seguro</string>
+    <string name="survey_experience_q3_option4">Probablemente no</string>
+    <string name="survey_experience_q3_option5">Definitivamente no</string>
+
+    <!-- Level Up Screen -->
+    <string name="level_up_title">¡Nivel %d Alcanzado!</string>
+    <string name="level_up_message">Has ganado %d XP</string>
+    <string name="level_up_next_reward">Próxima recompensa: %s</string>
+    <string name="level_up_tap_to_continue">Toca para continuar</string>
+
+    <!-- Experience Rewards -->
+    <string name="reward_novice_title">🎯 Novato</string>
+    <string name="reward_novice_description">Completaste tu primera encuesta</string>
+    <string name="reward_explorer_title">🔍 Explorador</string>
+    <string name="reward_explorer_description">Completaste 5 encuestas</string>
+    <string name="reward_enthusiast_title">🌟 Entusiasta</string>
+    <string name="reward_enthusiast_description">Completaste 10 encuestas</string>
+    <string name="reward_expert_title">🎓 Experto</string>
+    <string name="reward_expert_description">Completaste 15 encuestas</string>
+    <string name="reward_master_title">👑 Maestro</string>
+    <string name="reward_master_description">Completaste 20 encuestas</string>
+    <string name="reward_legend_title">⚡ Leyenda</string>
+    <string name="reward_legend_description">Completaste 25 encuestas</string>
+
+    <!-- Survey UI -->
+    <string name="survey_submit">Enviar Encuesta</string>
+    <string name="survey_answer_hint">Tu respuesta</string>
+    <string name="survey_completed">¡Encuesta completada! Ganaste %d XP</string>
+    <string name="survey_level_required">Necesitas ser nivel %d para completar esta encuesta</string>
+    <string name="survey_answer_all">Por favor responde todas las preguntas</string>
+    <string name="survey_reward">Recompensa: %d XP (Nivel %d requerido)</string>
+
+    <string name="statistics_card_title">Estadísticas</string>
+    <string name="statistics_level_default">Nivel 1</string>
+    <string name="statistics_experience_default">0/100 XP</string>
+    <string name="statistics_total_surveys_default">Total de encuestas completadas: 0</string>
+
+    <string name="change_profile_picture">Cambiar foto de perfil</string>
+    <string name="take_photo">Tomar foto</string>
+    <string name="choose_from_gallery">Elegir de la galería</string>
+
+    <string name="change_username">Cambiar nombre de usuario</string>
+    <string name="view_data_usage">Ver uso de datos</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="delete_account">Eliminar cuenta</string>
+    <string name="delete_account_warning">¿Estás seguro? Esta acción es irreversible y eliminará tu cuenta para siempre.</string>
+    <string name="delete_forever">Eliminar para siempre</string>
+    <string name="account_deleted">Cuenta eliminada</string>
+    <string name="error_deleting_account">Error al eliminar la cuenta</string>
+
+    <!-- Login and Registration -->
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="sign_in_with_google">Iniciar sesión con Google</string>
+    <string name="continue_without_login">Continuar sin iniciar sesión</string>
+    <string name="reset_password">Restablecer contraseña</string>
+    <string name="enter_email_for_reset">Ingresa tu correo electrónico para restablecer tu contraseña</string>
+    <string name="reset_email_sent">Se ha enviado un correo para restablecer tu contraseña</string>
+    <string name="error_reset_password">Error al enviar el correo de restablecimiento</string>
+    <string name="google_sign_in_failed">Error al iniciar sesión con Google</string>
+    <string name="non_authorized_user">Usuario no autorizado</string>
+
+    <string name="error_email_required">Email is required</string>
+    <string name="error_email_invalid">Enter a valid email</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_password_length">Password must be at least 6 characters</string>
+    <string name="error_confirm_password_required">Confirm password is required</string>
+    <string name="error_passwords_do_not_match">Passwords do not match</string>
+    <string name="registration_successful">Registration Successful.</string>
+    <string name="authentication_failed">Authentication failed: %1$s</string>
+    <string name="enter_username_hint">Introducir Nombre</string>
+
+    <string name="error_saving_user_data">Error al actualizar tu perfil. Por favor, inténtalo de nuevo.</string>
+    <string name="error_fetching_user_data">Error al obtener tu perfil. Por favor, inténtalo de nuevo.</string>
+    <string name="survey_completed_user_update_failed">¡Encuesta registrada! +%1$d XP. (Hubo un problema al actualizar el perfil)</string>
+
+    <string name="error_questions_not_loaded">Error: No se cargaron las preguntas.</string>
+    <string name="error_could_not_load_survey_questions">Error: No se pudieron cargar las preguntas de la encuesta.</string>
+    <string name="error_failed_to_init_questions_adapter">Error: Fallo al inicializar el adaptador de preguntas.</string>
+    <string name="error_collecting_answers_data_mismatch">Error al recopilar respuestas debido a una discrepancia de datos.</string>
+    <string name="error_processing_answers">Error al procesar las respuestas.</string>
+    <string name="error_survey_id_missing">Error: Falta el ID de la encuesta.</string>
+    <string name="error_user_profile_not_found_for_reward">Error: Perfil de usuario no encontrado para la recompensa.</string>
+    <string name="error_processing_user_profile_for_reward">Error al procesar el perfil de usuario para la recompensa.</string>
+    <string name="submitting_survey">Enviando encuesta...</string>
+
+    <string name="email">Correo electrónico</string>
+    <string name="password">Contraseña</string>
+    <string name="confirm_password">Confirmar contraseña</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="register">Registrarse</string>
+    <string name="already_have_account_login">¿Ya tienes una cuenta? Inicia sesión aquí.</string>
+    <string name="dont_have_account_register">¿No tienes una cuenta? Regístrate aquí.</string>
+    <string name="theme_toggle">Cambiar tema</string>
+
+    <!-- Shop Section -->
+    <string name="currency_title">Gems:</string>
+    <string name="rewards_section_title">Your Rewards</string>
+    <string name="shop_section_title">Shop</string>
+    <string name="shop_item_avatar">Avatar</string>
+    <string name="shop_item_frame">Frame</string>
+    <string name="shop_item_price">%d Gems</string>
+    <string name="shop_item_purchased">Purchased</string>
+    <string name="shop_item_buy">Comprar</string>
+    <string name="shop_item_equip">Equipar</string>
+    <string name="shop_item_equipped">Equipado</string>
+    <string name="shop_item_insufficient_funds">Gemas insuficientes</string>
+    <string name="shop_item_purchase_success">¡Compra exitosa!</string>
+    <string name="shop_item_equip_success">¡Artículo equipado!</string>
+    <string name="reward_currency_earned">+%d Gemas</string>
+    <string name="login_required_shop">Debes iniciar sesión para comprar en la tienda.</string>
+    <string name="login_required_equip">Debes iniciar sesión para equipar artículos de la tienda.</string>
+
+    <!-- Shop Item Strings -->
+    <string name="shop_item_avatar1_title">Avatar Básico</string>
+    <string name="shop_item_avatar1_description">Un avatar simple pero elegante</string>
+    <string name="shop_item_avatar2_title">Avatar Básico 2</string>
+    <string name="shop_item_avatar2_description">Un avatar premium con efectos especiales</string>
+    <string name="shop_item_avatar3_title">Avatar Épico</string>
+    <string name="shop_item_avatar3_description">Un avatar premium con efectos especiales</string>
+    <string name="shop_item_avatar4_title">Avatar Legendario</string>
+    <string name="shop_item_avatar4_description">Un avatar legendario exclusivo</string>
+    <string name="shop_item_frame1_title">Marco de Bronce</string>
+    <string name="shop_item_frame1_description">Un marco simple para tu avatar</string>
+    <string name="shop_item_frame2_title">Marco de Plata</string>
+    <string name="shop_item_frame2_description">Un marco premium con efectos especiales</string>
+    <string name="shop_item_frame3_title">Marco Legendario</string>
+    <string name="shop_item_frame3_description">Un marco legendario exclusivo</string>
+
+    <!-- Reward System -->
+    <string name="current_level">Nivel %d</string>
+    <string name="next_reward">Próxima recompensa: %s</string>
+    <string name="next_reward_format">Próxima recompensa: %s</string>
+    <string name="level_required">Nivel %d</string>
+    <string name="all_rewards_claimed">¡Todas las recompensas reclamadas!</string>
+    <string name="reward_icon_description">Icono de recompensa</string>
+    <string name="reward_achieved_description">Recompensa lograda.</string>
+</resources>

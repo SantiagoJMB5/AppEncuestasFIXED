@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "555768832767",
+    "project_id": "appencuestas-f4261",
+    "storage_bucket": "appencuestas-f4261.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:555768832767:android:cb14e5fc02092e25c322ca",
+        "android_client_info": {
+          "package_name": "com.lehikos.appencuestas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "555768832767-hgpdc9lfhgob0fscd86jk70niihb10mn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lehikos.appencuestas",
+            "certificate_hash": "fff3faba04eac583b2bbb3dde9fe4b53d26fdf51"
+          }
+        },
+        {
+          "client_id": "555768832767-b8k40nlsml78r2sbt7rffjbb5iqlqpnb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1ahwpyZ8QJQ0AlDj21HF2YFZ7mPfwyQY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "555768832767-b8k40nlsml78r2sbt7rffjbb5iqlqpnb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

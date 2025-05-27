@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/fondo1">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Level Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/level_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/card_background_dark">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                    <!-- Currency Amount and Icon -->
+                    <TextView
+                        android:id="@+id/currency_amount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textColor="@color/accent_dark_mode"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/currency_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_gem"
+                        app:tint="@color/accent_dark_mode"
+                        app:layout_constraintEnd_toStartOf="@id/currency_amount"
+                        app:layout_constraintTop_toTopOf="@id/currency_amount"
+                        app:layout_constraintBottom_toBottomOf="@id/currency_amount" />
+
+                    <TextView
+                        android:id="@+id/next_reward_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textColor="@color/on_surface_variant_dark"
+                        android:text="@string/next_reward"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/currency_amount" />
+
+                    <TextView
+                        android:id="@+id/next_reward_requirement"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="?attr/textAppearanceCaption"
+                        android:textColor="@color/primary_dark_mode"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/next_reward_text" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Currency Card -->
+            <!-- Removed redundant currency display card -->
+
+            <!-- Rewards Section -->
+            <TextView
+                android:id="@+id/rewards_section_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/rewards_section_title"
+                android:textColor="@color/on_surface_dark" />
+
+            <HorizontalScrollView
+                android:id="@+id/rewards_scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/rewards_slots_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical" />
+            </HorizontalScrollView>
+
+            <!-- Shop Section -->
+            <TextView
+                android:id="@+id/shop_section_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/shop_section_title"
+                android:textColor="@color/on_surface_dark" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/shop_items_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="80dp" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

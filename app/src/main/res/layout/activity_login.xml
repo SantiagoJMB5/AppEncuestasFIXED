@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center_horizontal"
+    tools:context=".ui.LoginActivity">
+
+    <EditText
+        android:id="@+id/editTextEmailLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/email"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/editTextPasswordLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/password"
+        android:inputType="textPassword" />
+
+    <TextView
+        android:id="@+id/textViewForgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/forgot_password"
+        android:textColor="@color/primary_color"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <Button
+        android:id="@+id/buttonLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/login" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/buttonGoogleSignIn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/sign_in_with_google" />
+
+    <TextView
+        android:id="@+id/textViewGoToRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/dont_have_account_register"
+        android:textAlignment="center"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <ProgressBar
+        android:id="@+id/progressBarLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/buttonContinueWithoutLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/continue_without_login"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/themeToggleContainer"
+        android:layout_width="48dp"
+        android:layout_height="120dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_night_mode">
+
+        <Button
+            android:id="@+id/buttonLightMode"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="☀️"
+            android:textStyle="bold"
+            android:background="@drawable/theme_toggle_light_selector"
+            android:contentDescription="@string/settings_theme_light" />
+
+        <Button
+            android:id="@+id/buttonDarkMode"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="🌙"
+            android:background="@drawable/theme_toggle_dark_selector"
+            android:contentDescription="@string/settings_theme_dark" />
+    </LinearLayout>
+</LinearLayout>
