@@ -252,50 +252,169 @@ public class HomeActivity extends BaseActivity {
 
     private void populateSampleSurveys(List<Survey> surveyListToPopulate) {
         surveyListToPopulate.clear();
+
         // Encuesta de Muestra: Satisfacción del Usuario
-        Survey satisfactionSurvey = new Survey("1", "Encuesta de Satisfacción", 
-            "Ayúdanos a mejorar nuestros servicios", 100, 1);
-        satisfactionSurvey.addQuestion(new Question("q1_satis", // IDs de pregunta únicos
-            "¿Qué te parece la interfaz de la aplicación?", 
-            Question.QuestionType.RATING));
+        Survey satisfactionSurvey = new Survey("1", "Encuesta de Satisfacción",
+                "Ayúdanos a mejorar nuestros servicios", 100, 1);
+        satisfactionSurvey.addQuestion(new Question("q1_satis",
+                "¿Qué te parece la interfaz de la aplicación?",
+                Question.QuestionType.RATING));
         satisfactionSurvey.addQuestion(new Question("q2_satis",
-            "¿Con qué frecuencia usas la aplicación?", 
-            Question.QuestionType.MULTIPLE_CHOICE,
-            Arrays.asList("Diariamente", "Semanalmente", "Mensualmente", "Raramente")));
+                "¿Con qué frecuencia usas la aplicación?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Diariamente", "Semanalmente", "Mensualmente", "Raramente")));
         satisfactionSurvey.addQuestion(new Question("q3_satis",
-            "¿Qué características te gustaría ver en futuras actualizaciones?", 
-            Question.QuestionType.TEXT));
+                "¿Qué características te gustaría ver en futuras actualizaciones?",
+                Question.QuestionType.TEXT));
         surveyListToPopulate.add(satisfactionSurvey);
-        
+
         // Encuesta de Muestra: Preferencias de Producto
-        Survey productSurvey = new Survey("2", "Encuesta de Productos", 
-            "Cuéntanos sobre tus productos favoritos", 150, 2);
-        productSurvey.addQuestion(new Question("q1_prod", // IDs de pregunta únicos
-            "¿Qué tipo de productos prefieres?", 
-            Question.QuestionType.MULTIPLE_CHOICE,
-            Arrays.asList("Tecnología", "Ropa", "Alimentos", "Hogar", "Otros")));
+        Survey productSurvey = new Survey("2", "Encuesta de Productos",
+                "Cuéntanos sobre tus productos favoritos", 150, 2);
+        productSurvey.addQuestion(new Question("q1_prod",
+                "¿Qué tipo de productos prefieres?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Tecnología", "Ropa", "Alimentos", "Hogar", "Otros")));
         productSurvey.addQuestion(new Question("q2_prod",
-            "¿Cuánto estás dispuesto a gastar en tus compras mensuales?", 
-            Question.QuestionType.MULTIPLE_CHOICE,
-            Arrays.asList("Menos de $100", "$100-$500", "$500-$1000", "Más de $1000")));
+                "¿Cuánto estás dispuesto a gastar en tus compras mensuales?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Menos de $100", "$100-$500", "$500-$1000", "Más de $1000")));
         surveyListToPopulate.add(productSurvey);
-        
+
         // Encuesta de Muestra: Experiencia del Usuario
-        Survey experienceSurvey = new Survey("3", "Encuesta de Experiencia", 
-            "Comparte tu experiencia con nosotros", 200, 3);
-        experienceSurvey.addQuestion(new Question("q1_exp", // IDs de pregunta únicos
-            "¿Qué te motivó a usar nuestra aplicación?", 
-            Question.QuestionType.TEXT));
+        Survey experienceSurvey = new Survey("3", "Encuesta de Experiencia",
+                "Comparte tu experiencia con nosotros", 200, 3);
+        experienceSurvey.addQuestion(new Question("q1_exp",
+                "¿Qué te motivó a usar nuestra aplicación?",
+                Question.QuestionType.TEXT));
         experienceSurvey.addQuestion(new Question("q2_exp",
-            "¿Qué tan satisfecho estás con el sistema de recompensas?", 
-            Question.QuestionType.RATING));
+                "¿Qué tan satisfecho estás con el sistema de recompensas?",
+                Question.QuestionType.RATING));
         experienceSurvey.addQuestion(new Question("q3_exp",
-            "¿Recomendarías la aplicación a otros?", 
-            Question.QuestionType.MULTIPLE_CHOICE,
-            Arrays.asList("Definitivamente sí", "Probablemente sí", "No estoy seguro", "Probablemente no", "Definitivamente no")));
+                "¿Recomendarías la aplicación a otros?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Definitivamente sí", "Probablemente sí", "No estoy seguro", "Probablemente no", "Definitivamente no")));
         surveyListToPopulate.add(experienceSurvey);
+
+        // NUEVAS ENCUESTAS
+
+        // Encuesta 4: Estilo de Vida
+        Survey lifestyleSurvey = new Survey("4", "Encuesta de Estilo de Vida",
+                "Conoce tus hábitos y rutinas diarias", 120, 4);
+        lifestyleSurvey.addQuestion(new Question("q1_life",
+                "¿A qué hora sueles despertarte entre semana?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Antes de las 6 a.m.", "6–8 a.m.", "8–10 a.m.", "Después de las 10 a.m.")));
+        lifestyleSurvey.addQuestion(new Question("q2_life",
+                "¿Cuántas veces haces ejercicio a la semana?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("0", "1–2", "3–5", "Más de 5")));
+        lifestyleSurvey.addQuestion(new Question("q3_life",
+                "Describe brevemente tu rutina matutina.",
+                Question.QuestionType.TEXT));
+        lifestyleSurvey.addQuestion(new Question("q4_life",
+                "¿Con qué frecuencia cocinas en casa?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Nunca", "Ocasionalmente", "Frecuentemente", "Siempre")));
+        lifestyleSurvey.addQuestion(new Question("q5_life",
+                "¿Cuál es tu nivel de estrés diario?",
+                Question.QuestionType.RATING));
+        surveyListToPopulate.add(lifestyleSurvey);
+
+        // Encuesta 5: Educación
+        Survey educationSurvey = new Survey("5", "Encuesta Educativa",
+                "Dinos más sobre tu formación y aprendizaje", 130, 5);
+        educationSurvey.addQuestion(new Question("q1_edu",
+                "¿Cuál es tu nivel educativo más alto?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Primaria", "Secundaria", "Universidad", "Posgrado")));
+        educationSurvey.addQuestion(new Question("q2_edu",
+                "¿Con qué frecuencia tomas cursos online?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Nunca", "Ocasionalmente", "Regularmente", "Frecuentemente")));
+        educationSurvey.addQuestion(new Question("q3_edu",
+                "¿Qué plataforma usas más para estudiar?",
+                Question.QuestionType.TEXT));
+        educationSurvey.addQuestion(new Question("q4_edu",
+                "¿Te gustaría recibir notificaciones sobre nuevos cursos?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Sí", "No")));
+        educationSurvey.addQuestion(new Question("q5_edu",
+                "Evalúa tu motivación para aprender nuevas habilidades.",
+                Question.QuestionType.RATING));
+        surveyListToPopulate.add(educationSurvey);
+
+        // Encuesta 6: Medio Ambiente
+        Survey ecoSurvey = new Survey("6", "Encuesta Ecológica",
+                "Queremos saber tus hábitos sostenibles", 140, 6);
+        ecoSurvey.addQuestion(new Question("q1_eco",
+                "¿Reciclas regularmente en tu hogar?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Sí", "A veces", "No")));
+        ecoSurvey.addQuestion(new Question("q2_eco",
+                "¿Utilizas transporte público o compartido?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Diariamente", "Semanalmente", "Raramente", "Nunca")));
+        ecoSurvey.addQuestion(new Question("q3_eco",
+                "¿Qué harías para mejorar tu impacto ambiental?",
+                Question.QuestionType.TEXT));
+        ecoSurvey.addQuestion(new Question("q4_eco",
+                "¿Con qué frecuencia compras productos ecológicos?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Siempre", "A menudo", "Ocasionalmente", "Nunca")));
+        ecoSurvey.addQuestion(new Question("q5_eco",
+                "Evalúa tu compromiso con el medio ambiente.",
+                Question.QuestionType.RATING));
+        surveyListToPopulate.add(ecoSurvey);
+
+        // Encuesta 7: Entretenimiento
+        Survey entertainmentSurvey = new Survey("7", "Encuesta de Entretenimiento",
+                "Queremos conocer tus gustos en ocio", 125, 7);
+        entertainmentSurvey.addQuestion(new Question("q1_ent",
+                "¿Cuál es tu género de películas favorito?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Acción", "Comedia", "Drama", "Ciencia Ficción", "Terror")));
+        entertainmentSurvey.addQuestion(new Question("q2_ent",
+                "¿Qué plataformas de streaming utilizas?",
+                Question.QuestionType.TEXT));
+        entertainmentSurvey.addQuestion(new Question("q3_ent",
+                "¿Cuántas horas a la semana dedicas al entretenimiento digital?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Menos de 5", "5–10", "10–20", "Más de 20")));
+        entertainmentSurvey.addQuestion(new Question("q4_ent",
+                "¿Cuál fue tu película o serie favorita del último año?",
+                Question.QuestionType.TEXT));
+        entertainmentSurvey.addQuestion(new Question("q5_ent",
+                "Evalúa la calidad del contenido en las plataformas actuales.",
+                Question.QuestionType.RATING));
+        surveyListToPopulate.add(entertainmentSurvey);
+
+        // Encuesta 8: Hábitos de Sueño
+        Survey sleepSurvey = new Survey("8", "Encuesta de Sueño",
+                "Cuéntanos sobre tus hábitos de descanso", 110, 8);
+        sleepSurvey.addQuestion(new Question("q1_sleep",
+                "¿A qué hora te acuestas habitualmente?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Antes de las 10 p.m.", "10–12 p.m.", "Después de las 12 a.m.")));
+        sleepSurvey.addQuestion(new Question("q2_sleep",
+                "¿Cuántas horas duermes por noche?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Menos de 5", "5–7", "7–9", "Más de 9")));
+        sleepSurvey.addQuestion(new Question("q3_sleep",
+                "¿Tienes dificultades para dormir?",
+                Question.QuestionType.MULTIPLE_CHOICE,
+                Arrays.asList("Frecuentemente", "A veces", "Rara vez", "Nunca")));
+        sleepSurvey.addQuestion(new Question("q4_sleep",
+                "¿Qué haces para relajarte antes de dormir?",
+                Question.QuestionType.TEXT));
+        sleepSurvey.addQuestion(new Question("q5_sleep",
+                "Evalúa la calidad de tu sueño en general.",
+                Question.QuestionType.RATING));
+        surveyListToPopulate.add(sleepSurvey);
+
         Log.d(TAG, "Encuestas de muestra pobladas. Cantidad: " + surveyListToPopulate.size());
     }
+
 
     // Este método ahora toma una lista de encuestas para guardar.
     private void saveSurveysToFirestore(List<Survey> surveysToSave) {
