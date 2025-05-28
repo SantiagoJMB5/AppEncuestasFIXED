@@ -45,6 +45,8 @@ public class HomeActivity extends BaseActivity {
     private static final String APP_PREFS = "AppPrefs";
     private static final String LANGUAGE_KEY = "language";
     private static final String THEME_KEY = "theme";
+    private static final String MUSIC_ENABLED_KEY = "music_enabled";
+    private static final String SOUND_EFFECTS_ENABLED_KEY = "sound_effects_enabled";
     private static final int REQUEST_CODE_SURVEY = 1; // Del nuevo código
 
     private RecyclerView recyclerView;
@@ -668,7 +670,7 @@ public class HomeActivity extends BaseActivity {
         PopupMenu popupMenu = new PopupMenu(this, v);
         popupMenu.getMenu().add(getString(R.string.settings_languages)); // Ítem 0
         popupMenu.getMenu().add(getString(R.string.settings_themes));    // Ítem 1
-      //  popupMenu.getMenu().add(getString(R.string.settings_logout));   // Ítem 2 (Re-añadido) - Asegurar que R.string.settings_logout exista
+        popupMenu.getMenu().add(getString(R.string.settings_sound));     // Ítem 2
 
         popupMenu.setOnMenuItemClickListener(item -> {
             String selectedItemTitle = item.getTitle().toString();
@@ -678,13 +680,54 @@ public class HomeActivity extends BaseActivity {
                 return true;
             } else if (selectedItemTitle.equals(getString(R.string.settings_themes))) {
                 showSubMenu(v, selectedItemTitle);
-            return true;
-           //  } else if (selectedItemTitle.equals(getString(R.string.settings_logout))) {
-            //    logoutUser(); // Re-añadido
-               // return true;
+                return true;
+            } else if (selectedItemTitle.equals(getString(R.string.settings_sound))) {
+                showSoundSettingsMenu(v);
+                return true;
             }
             return false;
         });
+        popupMenu.show();
+    }
+
+    private void showSoundSettingsMenu(View anchorView) {
+        PopupMenu popupMenu = new PopupMenu(this, anchorView);
+        SharedPreferences prefs = getSharedPreferences(APP_PREFS, MODE_PRIVATE);
+        boolean musicEnabled = prefs.getBoolean(MUSIC_ENABLED_KEY, true);
+        boolean soundEffectsEnabled = prefs.getBoolean(SOUND_EFFECTS_ENABLED_KEY, true);
+
+        // Add music toggle
+        popupMenu.getMenu().add(getString(R.string.settings_music))
+            .setCheckable(true)
+            .setChecked(musicEnabled);
+
+        // Add sound effects toggle
+        popupMenu.getMenu().add(getString(R.string.settings_sound_effects))
+            .setCheckable(true)
+            .setChecked(soundEffectsEnabled);
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            String selectedItemTitle = item.getTitle().toString();
+            SharedPreferences.Editor editor = prefs.edit();
+
+            if (selectedItemTitle.equals(getString(R.string.settings_music))) {
+                boolean newState = !item.isChecked();
+                editor.putBoolean(MUSIC_ENABLED_KEY, newState);
+                item.setChecked(newState);
+                // Notify RewardsActivity about music state change
+                Intent intent = new Intent("com.lehikos.appencuestas.MUSIC_STATE_CHANGED");
+                intent.putExtra("music_enabled", newState);
+                sendBroadcast(intent);
+            } else if (selectedItemTitle.equals(getString(R.string.settings_sound_effects))) {
+                boolean newState = !item.isChecked();
+                editor.putBoolean(SOUND_EFFECTS_ENABLED_KEY, newState);
+                item.setChecked(newState);
+            }
+
+            editor.apply();
+            return true;
+        });
+
         popupMenu.show();
     }
 

@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -43,6 +44,9 @@ public class RewardsActivity extends BaseActivity implements ShopAdapter.OnShopI
     private static final String PURCHASED_ITEMS_KEY = "purchased_items";
     private static final String EQUIPPED_AVATAR_KEY = "equipped_avatar";
     private static final String EQUIPPED_FRAME_KEY = "equipped_frame";
+    private static final String APP_PREFS = "AppPrefs";
+    private static final String MUSIC_ENABLED_KEY = "music_enabled";
+    private static final String SOUND_EFFECTS_ENABLED_KEY = "sound_effects_enabled";
 
     private SharedPreferences prefs;
     private RewardManager rewardManager;
@@ -51,6 +55,8 @@ public class RewardsActivity extends BaseActivity implements ShopAdapter.OnShopI
     private ShopAdapter shopAdapter;
     private List<ShopItem> shopItems;
     private TextView currencyAmountText;
+    private MediaPlayer shopMusic;
+    private boolean isMusicEnabled = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +64,14 @@ public class RewardsActivity extends BaseActivity implements ShopAdapter.OnShopI
         Log.d(TAG, "onCreate: Iniciado");
 
         prefs = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        SharedPreferences appPrefs = getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE);
+        isMusicEnabled = appPrefs.getBoolean(MUSIC_ENABLED_KEY, true);
+
+        // Initialize and start shop music if enabled
+        if (isMusicEnabled) {
+            initializeMusic();
+        }
+
         rewardManager = new RewardManager(prefs);
         rewardItemViews = new ArrayList<>();
 
@@ -79,6 +93,14 @@ public class RewardsActivity extends BaseActivity implements ShopAdapter.OnShopI
 
         setSelectedNavigationItem(R.id.Btn_rewards);
         Log.d(TAG, "onCreate: Finalizado");
+    }
+
+    private void initializeMusic() {
+        if (shopMusic == null) {
+            shopMusic = MediaPlayer.create(this, R.raw.music_shop);
+            shopMusic.setLooping(true);
+            shopMusic.start();
+        }
     }
 
     private void initializeShopItems() {
@@ -496,8 +518,43 @@ public class RewardsActivity extends BaseActivity implements ShopAdapter.OnShopI
     @Override
     protected void onResume() {
         super.onResume();
+        SharedPreferences appPrefs = getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE);
+        boolean shouldPlayMusic = appPrefs.getBoolean(MUSIC_ENABLED_KEY, true);
+
+        if (shouldPlayMusic && !isMusicEnabled) {
+            // Music was re-enabled
+            isMusicEnabled = true;
+            initializeMusic();
+        } else if (!shouldPlayMusic && isMusicEnabled) {
+            // Music was disabled
+            isMusicEnabled = false;
+            if (shopMusic != null) {
+                shopMusic.pause();
+            }
+        } else if (shouldPlayMusic && isMusicEnabled && shopMusic != null && !shopMusic.isPlaying()) {
+            // Music is enabled but not playing
+            shopMusic.start();
+        }
+
         // Sync rewards and gems with Firebase
         syncWithFirebase();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (shopMusic != null && shopMusic.isPlaying()) {
+            shopMusic.pause();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (shopMusic != null) {
+            shopMusic.release();
+            shopMusic = null;
+        }
     }
 
     private void syncWithFirebase() {

@@ -35,7 +35,32 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textAppearance="?attr/textAppearanceBody1"
-                android:layout_marginBottom="24dp"/>
+                android:layout_marginBottom="16dp"/>
+
+            <LinearLayout
+                android:id="@+id/gem_reward_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginBottom="24dp">
+
+                <ImageView
+                    android:id="@+id/gem_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_gem"
+                    android:layout_marginEnd="4dp"/>
+
+                <TextView
+                    android:id="@+id/gem_reward_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    android:textColor="?attr/colorPrimary"/>
+
+            </LinearLayout>
 
             <View
                 android:layout_width="match_parent"

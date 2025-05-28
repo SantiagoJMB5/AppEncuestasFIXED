@@ -331,8 +331,47 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        // Removed automatic navigation to HomeActivity
-        // We want to show login screen on first launch regardless of Firebase Auth state
+        
+        // Check if user has already seen the login screen
+        SharedPreferences appPrefs = getSharedPreferences(APP_PREFS, MODE_PRIVATE);
+        boolean hasSeenLoginScreen = appPrefs.getBoolean("hasSeenLoginScreen", false);
+
+        if (hasSeenLoginScreen) {
+            // Check Firebase Auth state
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+            if (currentUser != null) {
+                // User is signed in with Firebase, go to home
+                navigateToHome();
+                return;
+            }
+
+            // Check for non-authorized user
+            SharedPreferences userPrefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            String nonAuthUserId = userPrefs.getString("non_authorized_user_id", null);
+            if (nonAuthUserId != null) {
+                // Verify the non-authorized user still exists in Firestore
+                db.collection("non_authorized_users").document(nonAuthUserId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            // Non-authorized user exists, go to home
+                            navigateToHome();
+                        } else {
+                            // Non-authorized user document was deleted, clear preferences
+                            userPrefs.edit().remove("non_authorized_user_id").apply();
+                            appPrefs.edit().remove("hasSeenLoginScreen").apply();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Error checking non-authorized user", e);
+                        // On error, stay on login screen
+                    });
+            }
+        }
+        // If we get here, either:
+        // 1. User hasn't seen login screen before
+        // 2. No valid user state found
+        // In both cases, stay on login screen
     }
 
     private void setThemePreference(String themeName) {
