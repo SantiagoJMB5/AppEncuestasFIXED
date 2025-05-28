@@ -58,6 +58,7 @@ public class StatisticsActivity extends BaseActivity {
     private String userId;
     private ImageButton profileButton;
     // private Uri profileImageUri; // Parece no usarse, se puede quitar si es así
+    private boolean isActivityJustStarted = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +141,7 @@ public class StatisticsActivity extends BaseActivity {
             loadProfilePicture();
         }
         // Si userId es null, onCreate se encargará de la lógica de generación/carga inicial.
+        isActivityJustStarted = false;
     }
 
     private void generateAndSaveNonAuthorizedUser() {
@@ -262,7 +264,7 @@ public class StatisticsActivity extends BaseActivity {
     }
 
     private void saveUserDataToPreferences(DocumentSnapshot document) {
-        // This method is now only used for non-authorized users
+        // Este método ahora solo se usa para usuarios no autorizados
         SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
@@ -276,7 +278,7 @@ public class StatisticsActivity extends BaseActivity {
     }
 
     private void loadUserDataFromPreferences() {
-        // This method is now only used as a fallback when Firebase data is not available
+        // Este método ahora solo se usa como respaldo cuando los datos de Firebase no están disponibles
         SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
 
         int level = prefs.getInt("user_level", 1);
@@ -296,7 +298,7 @@ public class StatisticsActivity extends BaseActivity {
 
         totalSurveysText.setText(getString(R.string.total_surveys_format, totalSurveys));
 
-        // Check for level up using preferences data
+        // Verificar subida de nivel usando datos de preferencias
         SharedPreferences levelUpPrefs = getSharedPreferences(LEVEL_UP_PREFS_NAME, MODE_PRIVATE);
         int lastLevelUpShown = levelUpPrefs.getInt(KEY_LAST_LEVEL_UP_SHOWN, 0);
 
@@ -312,18 +314,18 @@ public class StatisticsActivity extends BaseActivity {
 
     private void updateUI(DocumentSnapshot document) {
         Log.d(TAG, "updateUI called with document: " + document.getId());
-        // Get data from Firestore
+        // Obtener datos de Firestore
         int levelFromFirestore = document.getLong("level") != null ? document.getLong("level").intValue() : 1;
         int experienceFromFirestore = document.getLong("experience") != null ? document.getLong("experience").intValue() : 0;
         int totalSurveys = document.getLong("totalSurveys") != null ? document.getLong("totalSurveys").intValue() : 0;
         String username = document.getString("username");
         Log.d(TAG, "Username from Firestore in updateUI: " + username);
 
-        // Update UI with Firestore data
+        // Actualizar UI con datos de Firestore
         if (username != null && !username.isEmpty()) {
             Log.d(TAG, "Setting username from Firestore: " + username);
             usernameText.setText(username);
-            // Also update SharedPreferences as backup
+            // También actualizar SharedPreferences como respaldo
             SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             prefs.edit().putString("user_username", username).apply();
             Log.d(TAG, "Updated username in SharedPreferences: " + username);
@@ -343,19 +345,47 @@ public class StatisticsActivity extends BaseActivity {
         experienceBar.setProgress(progress);
         totalSurveysText.setText(getString(R.string.total_surveys_format, totalSurveys));
 
-        // Check for level up using Firestore data
-        SharedPreferences prefs = getSharedPreferences(LEVEL_UP_PREFS_NAME, MODE_PRIVATE);
-        int lastLevelUpShown = prefs.getInt(KEY_LAST_LEVEL_UP_SHOWN, 0);
+        // Obtener último nivel mostrado de Firebase primero
+        int lastLevelUpShown = document.getLong("lastLevelUpShown") != null ? 
+            document.getLong("lastLevelUpShown").intValue() : 0;
+
+        // Si no está en Firebase, intentar SharedPreferences como respaldo
+        if (lastLevelUpShown == 0) {
+            SharedPreferences prefs = getSharedPreferences(LEVEL_UP_PREFS_NAME, MODE_PRIVATE);
+            lastLevelUpShown = prefs.getInt(KEY_LAST_LEVEL_UP_SHOWN, 0);
+        }
 
         Log.d(TAG, "Checking for level up. Level from Firestore: " + levelFromFirestore + ", LastLevelUpShown: " + lastLevelUpShown);
 
-        if (levelFromFirestore > lastLevelUpShown && levelFromFirestore > 1) {
+        // Solo mostrar subida de nivel si no lo hemos mostrado para este nivel Y no estamos solo cargando la actividad
+        if (levelFromFirestore > lastLevelUpShown && levelFromFirestore > 1 && !isActivityJustStarted) {
             Log.d(TAG, "Level up detected! Showing dialog. New Level: " + levelFromFirestore);
             showLevelUpDialog(levelFromFirestore, experienceFromFirestore);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt(KEY_LAST_LEVEL_UP_SHOWN, levelFromFirestore);
-            editor.apply();
-            Log.d(TAG, "Updated lastLevelUpShown to: " + levelFromFirestore + " in SharedPreferences");
+            
+            // Actualizar tanto Firebase como SharedPreferences
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("lastLevelUpShown", levelFromFirestore);
+            
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            String collection = (currentUser == null) ? "non_authorized_users" : "users";
+            String userId = (currentUser != null) ? currentUser.getUid() : this.userId;
+            
+            if (userId != null) {
+                FirebaseFirestore.getInstance().collection(collection).document(userId)
+                    .update(updates)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "Updated lastLevelUpShown in Firebase to: " + levelFromFirestore);
+                        // También actualizar SharedPreferences como respaldo
+                        SharedPreferences prefs = getSharedPreferences(LEVEL_UP_PREFS_NAME, MODE_PRIVATE);
+                        prefs.edit().putInt(KEY_LAST_LEVEL_UP_SHOWN, levelFromFirestore).apply();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Error updating lastLevelUpShown in Firebase", e);
+                        // Si la actualización de Firebase falla, al menos guardar en SharedPreferences
+                        SharedPreferences prefs = getSharedPreferences(LEVEL_UP_PREFS_NAME, MODE_PRIVATE);
+                        prefs.edit().putInt(KEY_LAST_LEVEL_UP_SHOWN, levelFromFirestore).apply();
+                    });
+            }
         }
     }
 
@@ -387,11 +417,10 @@ public class StatisticsActivity extends BaseActivity {
                     // así que si se muestra un LevelUp para el nivel 1 es una decisión de diseño.
                     // Normalmente, el nivel 1 no se "sube", se empieza en él.
                     // Podrías inicializar lastLevelUpShown a 1 para nuevos usuarios si no quieres pop-up para el nivel 1.
+                    // For a new user, you might want to set lastLevelUpShown to the initial level (1)
+                    // to prevent a "Level Up" for reaching level 1.
                     SharedPreferences levelUpPrefs = getSharedPreferences(LEVEL_UP_PREFS_NAME, MODE_PRIVATE);
                     SharedPreferences.Editor editor = levelUpPrefs.edit();
-                    // Para un nuevo usuario, podrías establecer lastLevelUpShown al nivel inicial (1)
-                    // para evitar que se muestre un "Level Up" por alcanzar el nivel 1.
-                    editor.putInt(KEY_LAST_LEVEL_UP_SHOWN, 1); // Asumiendo que el nivel inicial es 1
                     editor.apply();
 
                     loadUserStatistics(); // Carga las estadísticas después de crear el usuario
@@ -402,7 +431,7 @@ public class StatisticsActivity extends BaseActivity {
 
     private void showLevelUpDialog(int newLevel, int currentExperience) {
         Log.d(TAG, "Showing LevelUpActivity for Level: " + newLevel + " with XP: " + currentExperience);
-        // Save current username before showing level up dialog
+        // Guardar nombre de usuario actual antes de mostrar el diálogo de subida de nivel
         String currentUsername = usernameText.getText().toString();
         Log.d(TAG, "Current username before level up: " + currentUsername);
         
@@ -411,13 +440,13 @@ public class StatisticsActivity extends BaseActivity {
         intent.putExtra(LevelUpActivity.EXTRA_EXPERIENCE, currentExperience);
         startActivity(intent);
         
-        // After level up dialog is shown, ensure username is preserved
+        // Después de mostrar el diálogo de subida de nivel, asegurar que el nombre de usuario se preserve
         if (currentUsername != null && !currentUsername.isEmpty()) {
             Log.d(TAG, "Preserving username after level up: " + currentUsername);
             SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             prefs.edit().putString("user_username", currentUsername).apply();
             
-            // Also update in Firebase if user is authorized
+            // También actualizar en Firebase si el usuario está autorizado
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             if (currentUser != null) {
                 Map<String, Object> data = new HashMap<>();
@@ -596,26 +625,26 @@ public class StatisticsActivity extends BaseActivity {
             return;
         }
 
-        // Save to Firebase first
+        // Guardar en Firebase primero
         Map<String, Object> data = new HashMap<>();
         data.put("username", username);
         
         FirebaseFirestore.getInstance().collection(collection).document(userId)
             .set(data, SetOptions.merge())
             .addOnSuccessListener(aVoid -> {
-                // After successful Firebase save, update SharedPreferences as backup
+                // Después de guardar exitosamente en Firebase, actualizar SharedPreferences como respaldo
                 SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                 prefs.edit().putString("user_username", username).apply();
                 Log.d(TAG, "Username saved successfully to Firebase and SharedPreferences");
-                // Update the UI with the new username
+                // Actualizar la UI con el nuevo nombre de usuario
                 usernameText.setText(username);
             })
             .addOnFailureListener(e -> {
                 Log.e(TAG, "Error saving username to Firebase", e);
-                // If Firebase save fails, at least save to SharedPreferences
+                // Si falla el guardado en Firebase, al menos guardar en SharedPreferences
                 SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                 prefs.edit().putString("user_username", username).apply();
-                // Update the UI with the new username even if Firebase save failed
+                // Actualizar la UI con el nuevo nombre de usuario incluso si falla el guardado en Firebase
                 usernameText.setText(username);
             });
     }
