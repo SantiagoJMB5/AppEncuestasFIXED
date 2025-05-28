@@ -26,6 +26,9 @@
     <string name="settings_theme_dark">Tema oscuro</string>
     <string name="settings_languages">Idiomas</string>
     <string name="settings_themes">Temas</string>
+    <string name="settings_sound">Configuración de Sonido</string>
+    <string name="settings_music">Música de Fondo</string>
+    <string name="settings_sound_effects">Efectos de Sonido</string>
 
     <!-- Personalización de los nombres de los meses -->
     <string-array name="custom_months">
