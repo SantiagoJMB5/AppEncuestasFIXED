@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,20 +27,32 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.lehikos.appencuestas.R;
 import com.lehikos.appencuestas.RewardManager;
+import com.lehikos.appencuestas.models.Survey;
+import com.lehikos.appencuestas.adapters.UserSurveysAdapter;
+import com.lehikos.appencuestas.models.User;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class StatisticsActivity extends BaseActivity {
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.card.MaterialCardView;
+
+public class StatisticsActivity extends BaseActivity implements UserSurveysAdapter.OnSurveyActionsListener {
     private static final String TAG = "StatisticsActivity";
     private static final int XP_PER_LEVEL = 100; // Asumiendo que esto es constante
     private static final int REQUEST_IMAGE_CAPTURE = 101;
     private static final int REQUEST_IMAGE_PICK = 102;
+    private static final int REQUEST_LEVEL_UP_DIALOG = 103; // New request code for LevelUpActivity
 
     // ----- NUEVO: Constantes para SharedPreferences del estado de subida de nivel -----
     private static final String LEVEL_UP_PREFS_NAME = "LevelUpStatePrefs";
@@ -59,6 +72,12 @@ public class StatisticsActivity extends BaseActivity {
     private ImageButton profileButton;
     // private Uri profileImageUri; // Parece no usarse, se puede quitar si es así
     private boolean isActivityJustStarted = true;
+    private RecyclerView userSurveysRecyclerView;
+    private MaterialCardView yourSurveysHeaderCard;
+    private UserSurveysAdapter userSurveysAdapter;
+
+    // Flag to prevent showing the level up dialog again immediately after returning
+    private boolean shouldPreventLevelUpDialogOnResume = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +91,8 @@ public class StatisticsActivity extends BaseActivity {
         totalSurveysText = findViewById(R.id.total_surveys_text);
         usernameText = findViewById(R.id.username_text);
         profileButton = findViewById(R.id.profile_button);
+        yourSurveysHeaderCard = findViewById(R.id.your_surveys_header);
+        userSurveysRecyclerView = findViewById(R.id.user_surveys_recycler_view);
 
         profileButton.setOnClickListener(v -> {
             Log.d(TAG, "Profile button clicked, attempting to open ProfileActivity");
@@ -105,6 +126,20 @@ public class StatisticsActivity extends BaseActivity {
             loadUserStatistics();
             loadProfilePicture();
         }
+        loadUserSurveys();
+
+        // Setup RecyclerView
+        userSurveysRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // Adapter will be set in loadUserSurveys
+
+        // Toggle visibility of the user surveys RecyclerView when the header card is clicked
+        yourSurveysHeaderCard.setOnClickListener(v -> {
+            if (userSurveysRecyclerView.getVisibility() == View.GONE) {
+                userSurveysRecyclerView.setVisibility(View.VISIBLE);
+            } else {
+                userSurveysRecyclerView.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void checkNonAuthorizedUserInFirestore(String nonAuthUserId) {
@@ -116,6 +151,7 @@ public class StatisticsActivity extends BaseActivity {
                     } else {
                         loadUserStatistics();
                         loadProfilePicture();
+                        loadUserSurveys();
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -125,6 +161,7 @@ public class StatisticsActivity extends BaseActivity {
                     // Por ahora, se asume que si falla es mejor intentar cargar estadísticas igualmente.
                     loadUserStatistics();
                     loadProfilePicture();
+                    loadUserSurveys();
                 });
     }
 
@@ -134,14 +171,19 @@ public class StatisticsActivity extends BaseActivity {
         super.onResume();
         Log.d(TAG, "onResume called");
         // Recargar estadísticas cuando la actividad se reanuda,
-        // solo si userId ya está determinado.
-        if (userId != null && !userId.isEmpty()) {
+        // solo si userId ya está determinado y we are not preventing the dialog
+        if (userId != null && !userId.isEmpty() && !shouldPreventLevelUpDialogOnResume) {
             Log.d(TAG, "Reloading user statistics in onResume");
             loadUserStatistics();
             loadProfilePicture();
+            loadUserSurveys();
+        } else if (shouldPreventLevelUpDialogOnResume) {
+             // Reset the flag after onResume has completed its checks without showing the dialog
+             shouldPreventLevelUpDialogOnResume = false;
+             Log.d(TAG, "Resetting shouldPreventLevelUpDialogOnResume flag.");
         }
         // Si userId es null, onCreate se encargará de la lógica de generación/carga inicial.
-        isActivityJustStarted = false;
+        isActivityJustStarted = false; // Now onResume is called after the initial onCreate
     }
 
     private void generateAndSaveNonAuthorizedUser() {
@@ -205,6 +247,7 @@ public class StatisticsActivity extends BaseActivity {
                     rewardManager = new RewardManager(getSharedPreferences("UserPrefs", MODE_PRIVATE)); // Inicializa aquí
                     loadUserStatistics();
                     loadProfilePicture();
+                    loadUserSurveys();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error creating user profile", Toast.LENGTH_SHORT).show();
@@ -304,11 +347,12 @@ public class StatisticsActivity extends BaseActivity {
 
         if (level > lastLevelUpShown && level > 1) {
             Log.d(TAG, "Level up detected from Preferences data. Current Level: " + level + ", Last Level Shown: " + lastLevelUpShown);
-            showLevelUpDialog(level, experience);
-            SharedPreferences.Editor editor = levelUpPrefs.edit();
-            editor.putInt(KEY_LAST_LEVEL_UP_SHOWN, level);
-            editor.apply();
-            Log.d(TAG, "Updated lastLevelUpShown to: " + level + " in SharedPreferences (from preferences load path)");
+             // Now handled via startActivityForResult in updateUI
+            // showLevelUpDialog(level, experience);
+            // SharedPreferences.Editor editor = levelUpPrefs.edit();
+            // editor.putInt(KEY_LAST_LEVEL_UP_SHOWN, level);
+            // editor.apply();
+            // Log.d(TAG, "Updated lastLevelUpShown to: " + level + " in SharedPreferences (from preferences load path)");
         }
     }
 
@@ -338,10 +382,30 @@ public class StatisticsActivity extends BaseActivity {
         }
 
         levelText.setText(getString(R.string.level_format, levelFromFirestore));
-        int currentLevelXP = experienceFromFirestore % XP_PER_LEVEL;
-        int nextLevelXP = XP_PER_LEVEL;
-        experienceText.setText(getString(R.string.experience_format, currentLevelXP, nextLevelXP));
-        int progress = (nextLevelXP > 0) ? (currentLevelXP * 100) / nextLevelXP : 0;
+        // Calculate XP within the current level and total XP needed for the next level
+        int currentLevelBaseXP = 0;
+        if (levelFromFirestore > 1 && levelFromFirestore - 1 < User.EXPERIENCE_PER_LEVEL.length) {
+            currentLevelBaseXP = User.EXPERIENCE_PER_LEVEL[levelFromFirestore - 1];
+        }
+        int currentLevelXP = experienceFromFirestore - currentLevelBaseXP;
+
+        int nextLevelTotalXP = 0;
+        if (levelFromFirestore < User.EXPERIENCE_PER_LEVEL.length) {
+            nextLevelTotalXP = User.EXPERIENCE_PER_LEVEL[levelFromFirestore];
+        } else {
+             // User is at max level or beyond the defined levels
+             nextLevelTotalXP = experienceFromFirestore; // Display total XP if max level
+        }
+        int totalXpNeededForNextLevel = nextLevelTotalXP - currentLevelBaseXP;
+
+        experienceText.setText(getString(R.string.experience_format, currentLevelXP, totalXpNeededForNextLevel));
+
+        int progress = 0;
+        if (totalXpNeededForNextLevel > 0) {
+             // Calculate progress based on XP within the current level
+             progress = (currentLevelXP * 100) / totalXpNeededForNextLevel;
+        }
+
         experienceBar.setProgress(progress);
         totalSurveysText.setText(getString(R.string.total_surveys_format, totalSurveys));
 
@@ -357,35 +421,21 @@ public class StatisticsActivity extends BaseActivity {
 
         Log.d(TAG, "Checking for level up. Level from Firestore: " + levelFromFirestore + ", LastLevelUpShown: " + lastLevelUpShown);
 
-        // Solo mostrar subida de nivel si no lo hemos mostrado para este nivel Y no estamos solo cargando la actividad
-        if (levelFromFirestore > lastLevelUpShown && levelFromFirestore > 1 && !isActivityJustStarted) {
+        // Solo mostrar subida de nivel if not already shown for this level, level > 1, and not just started
+        // And also not preventing the dialog on resume
+        if (levelFromFirestore > lastLevelUpShown && levelFromFirestore > 1 && !isActivityJustStarted && !shouldPreventLevelUpDialogOnResume) {
             Log.d(TAG, "Level up detected! Showing dialog. New Level: " + levelFromFirestore);
             showLevelUpDialog(levelFromFirestore, experienceFromFirestore);
             
-            // Actualizar tanto Firebase como SharedPreferences
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("lastLevelUpShown", levelFromFirestore);
-            
-            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-            String collection = (currentUser == null) ? "non_authorized_users" : "users";
-            String userId = (currentUser != null) ? currentUser.getUid() : this.userId;
-            
-            if (userId != null) {
-                FirebaseFirestore.getInstance().collection(collection).document(userId)
-                    .update(updates)
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d(TAG, "Updated lastLevelUpShown in Firebase to: " + levelFromFirestore);
-                        // También actualizar SharedPreferences como respaldo
-                        SharedPreferences prefs = getSharedPreferences(LEVEL_UP_PREFS_NAME, MODE_PRIVATE);
-                        prefs.edit().putInt(KEY_LAST_LEVEL_UP_SHOWN, levelFromFirestore).apply();
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e(TAG, "Error updating lastLevelUpShown in Firebase", e);
-                        // Si la actualización de Firebase falla, al menos guardar en SharedPreferences
-                        SharedPreferences prefs = getSharedPreferences(LEVEL_UP_PREFS_NAME, MODE_PRIVATE);
-                        prefs.edit().putInt(KEY_LAST_LEVEL_UP_SHOWN, levelFromFirestore).apply();
-                    });
-            }
+            // Set the flag to prevent showing the dialog again immediately on resume
+            shouldPreventLevelUpDialogOnResume = true;
+            Log.d(TAG, "Setting shouldPreventLevelUpDialogOnResume flag.");
+
+            // The update to Firebase/SharedPreferences will happen in onActivityResult
+        } else if (shouldPreventLevelUpDialogOnResume) {
+             // If the flag is set, we just log that we prevented the dialog
+             Log.d(TAG, "Prevented level up dialog on resume due to flag.");
+             // The flag is reset at the end of onResume
         }
     }
 
@@ -404,6 +454,7 @@ public class StatisticsActivity extends BaseActivity {
         userData.put("experience", 0);
         userData.put("level", 1);
         userData.put("totalSurveys", 0);
+        userData.put("lastLevelUpShown", 1); // Initialize lastLevelUpShown for new users
 
         db.collection(collection).document(this.userId)
                 .set(userData)
@@ -413,17 +464,14 @@ public class StatisticsActivity extends BaseActivity {
                     // No es necesario volver a llamar a loadUserStatistics() aquí si la UI se actualiza directamente,
                     // o si se asume que la próxima llamada a onResume/loadUserStatistics manejará la carga completa.
                     // Por consistencia, podrías llamarlo, pero puede ser redundante.
-                    // Para la subida de nivel, 'lastLevelUpShown' se inicializaría a 0, y el nivel 1 sería > 0,
-                    // así que si se muestra un LevelUp para el nivel 1 es una decisión de diseño.
-                    // Normalmente, el nivel 1 no se "sube", se empieza en él.
-                    // Podrías inicializar lastLevelUpShown a 1 para nuevos usuarios si no quieres pop-up para el nivel 1.
-                    // For a new user, you might want to set lastLevelUpShown to the initial level (1)
-                    // to prevent a "Level Up" for reaching level 1.
+                    // For a new user, initialize lastLevelUpShown to 1 in SharedPreferences as well
                     SharedPreferences levelUpPrefs = getSharedPreferences(LEVEL_UP_PREFS_NAME, MODE_PRIVATE);
                     SharedPreferences.Editor editor = levelUpPrefs.edit();
+                    editor.putInt(KEY_LAST_LEVEL_UP_SHOWN, 1); // Initialize to 1 for new users
                     editor.apply();
 
                     loadUserStatistics(); // Carga las estadísticas después de crear el usuario
+                    loadUserSurveys();
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Error creating user document", e));
     }
@@ -438,28 +486,139 @@ public class StatisticsActivity extends BaseActivity {
         Intent intent = new Intent(this, LevelUpActivity.class);
         intent.putExtra(LevelUpActivity.EXTRA_LEVEL, newLevel);
         intent.putExtra(LevelUpActivity.EXTRA_EXPERIENCE, currentExperience);
-        startActivity(intent);
+        // Start Activity for Result
+        startActivityForResult(intent, REQUEST_LEVEL_UP_DIALOG);
         
-        // Después de mostrar el diálogo de subida de nivel, asegurar que el nombre de usuario se preserve
+        // After showing the level up dialog, ensure the username is preserved
+        // Moved this logic to onActivityResult
+        // if (currentUsername != null && !currentUsername.isEmpty()) {
+        //     Log.d(TAG, "Preserving username after level up: " + currentUsername);
+        //     SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        //     prefs.edit().putString("user_username", currentUsername).apply();
+        //
+        //     // También actualizar en Firebase si el usuario está autorizado
+        //     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        //     if (currentUser != null) {
+        //         Map<String, Object> data = new HashMap<>();
+        //         data.put("username", currentUsername);
+        //         db.collection("users").document(currentUser.getUid())
+        //             .set(data, SetOptions.merge())
+        //             .addOnSuccessListener(aVoid -> Log.d(TAG, "Username preserved in Firebase after level up"))
+        //             .addOnFailureListener(e -> Log.e(TAG, "Error preserving username in Firebase after level up", e));
+        //     }
+        // }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK && data != null && data.getExtras() != null) {
+            Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+            if (imageBitmap != null) {
+                profileButton.setImageBitmap(imageBitmap);
+                saveProfilePicture(imageBitmap);
+            }
+        } else if (requestCode == REQUEST_IMAGE_PICK && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+            Uri selectedImage = data.getData();
+            try {
+                Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                if (imageBitmap != null) {
+                    profileButton.setImageBitmap(imageBitmap);
+                    saveProfilePicture(imageBitmap);
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Error getting bitmap from gallery URI", e);
+                Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == REQUEST_LEVEL_UP_DIALOG && resultCode == Activity.RESULT_OK) {
+             // Level up dialog was successfully shown and dismissed
+             Log.d(TAG, "Received RESULT_OK from LevelUpActivity.");
+             // The level shown should ideally be passed back as an extra, but we can also
+             // just rely on the current level in loadUserStatistics/updateUI after resume.
+             // Fetch current level again to be sure
+             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+             String collection = (currentUser == null) ? "non_authorized_users" : "users";
+             String currentUserId = (currentUser != null) ? currentUser.getUid() : this.userId;
+
+             if (currentUserId != null) {
+                  db.collection(collection).document(currentUserId).get()
+                      .addOnSuccessListener(document -> {
+                           if (document.exists()) {
+                                int currentLevel = document.getLong("level") != null ? document.getLong("level").intValue() : 1;
+                                // Update lastLevelUpShown to the current level in Firebase and SharedPreferences
+                                Map<String, Object> updates = new HashMap<>();
+                                updates.put("lastLevelUpShown", currentLevel);
+
+                                db.collection(collection).document(currentUserId)
+                                    .update(updates)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d(TAG, "Updated lastLevelUpShown in Firebase to: " + currentLevel + " from onActivityResult");
+                                        // Also update SharedPreferences as backup
+                                        SharedPreferences prefs = getSharedPreferences(LEVEL_UP_PREFS_NAME, MODE_PRIVATE);
+                                        prefs.edit().putInt(KEY_LAST_LEVEL_UP_SHOWN, currentLevel).apply();
+                                        Log.d(TAG, "Updated lastLevelUpShown in SharedPreferences to: " + currentLevel + " from onActivityResult");
+
+                                        // Reset the flag after successful update
+                                        shouldPreventLevelUpDialogOnResume = false;
+                                        Log.d(TAG, "Resetting shouldPreventLevelUpDialogOnResume flag after update.");
+
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e(TAG, "Error updating lastLevelUpShown in Firebase from onActivityResult", e);
+                                        // If Firebase update fails, at least save to SharedPreferences
+                                        SharedPreferences prefs = getSharedPreferences(LEVEL_UP_PREFS_NAME, MODE_PRIVATE);
+                                        prefs.edit().putInt(KEY_LAST_LEVEL_UP_SHOWN, currentLevel).apply();
+                                        // Reset the flag even if Firebase update failed, rely on SP backup
+                                        shouldPreventLevelUpDialogOnResume = false;
+                                        Log.d(TAG, "Resetting shouldPreventLevelUpDialogOnResume flag after failed Firebase update.");
+                                    });
+                           } else {
+                                Log.e(TAG, "User document not found after LevelUpActivity dismissal.");
+                                // In case document is suddenly gone, reset the flag anyway
+                                shouldPreventLevelUpDialogOnResume = false;
+                                Log.d(TAG, "Resetting shouldPreventLevelUpDialogOnResume flag due to missing document.");
+                           }
+                      })
+                      .addOnFailureListener(e -> {
+                           Log.e(TAG, "Error fetching user data after LevelUpActivity dismissal", e);
+                           // On failure to fetch user data, reset the flag anyway
+                           shouldPreventLevelUpDialogOnResume = false;
+                           Log.d(TAG, "Resetting shouldPreventLevelUpDialogOnResume flag due to fetch error.");
+                      });
+
+                   // Also handle username preservation here if needed after the dialog
+                   String currentUsername = usernameText.getText().toString();
         if (currentUsername != null && !currentUsername.isEmpty()) {
-            Log.d(TAG, "Preserving username after level up: " + currentUsername);
+                        Log.d(TAG, "Preserving username after level up (onActivityResult): " + currentUsername);
             SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             prefs.edit().putString("user_username", currentUsername).apply();
             
-            // También actualizar en Firebase si el usuario está autorizado
-            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                        // Update in Firebase if the user is authorized
             if (currentUser != null) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("username", currentUsername);
+                            Map<String, Object> updates = new HashMap<>();
+                            updates.put("username", currentUsername);
                 db.collection("users").document(currentUser.getUid())
-                    .set(data, SetOptions.merge())
-                    .addOnSuccessListener(aVoid -> Log.d(TAG, "Username preserved in Firebase after level up"))
-                    .addOnFailureListener(e -> Log.e(TAG, "Error preserving username in Firebase after level up", e));
+                                .set(updates, SetOptions.merge())
+                                .addOnSuccessListener(aVoid -> Log.d(TAG, "Username preserved in Firebase after level up (onActivityResult)"))
+                                .addOnFailureListener(e -> Log.e(TAG, "Error preserving username in Firebase after level up (onActivityResult)", e));
             }
+        }
+             } else {
+                  Log.e(TAG, "User ID is null in onActivityResult, cannot update lastLevelUpShown.");
+                  // If userId is null, reset the flag
+                  shouldPreventLevelUpDialogOnResume = false;
+                  Log.d(TAG, "Resetting shouldPreventLevelUpDialogOnResume flag due to null userId.");
+             }
+        } else {
+            Log.d(TAG, "onActivityResult: received request code " + requestCode + " and result code " + resultCode + ", no specific action taken.");
+            // If the activity was cancelled or returned a different result, we still want to allow the dialog next time
+            shouldPreventLevelUpDialogOnResume = false;
+             Log.d(TAG, "Resetting shouldPreventLevelUpDialogOnResume flag for non-level-up result.");
         }
     }
 
-    // Métodos de imagen de perfil (showProfilePictureDialog, loadProfilePicture, saveProfilePicture, onActivityResult)
+
+    // Métodos de imagen de perfil (showProfilePictureDialog, loadProfilePicture, saveProfilePicture)
     // no necesitan cambios para la lógica de subida de nivel. Se mantienen como están.
     private void showProfilePictureDialog() {
         // ... (tu código existente)
@@ -548,31 +707,6 @@ public class StatisticsActivity extends BaseActivity {
         }
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            Bitmap imageBitmap = null;
-            if (requestCode == REQUEST_IMAGE_CAPTURE && data != null && data.getExtras() != null) {
-                imageBitmap = (Bitmap) data.getExtras().get("data");
-            } else if (requestCode == REQUEST_IMAGE_PICK && data != null && data.getData() != null) {
-                Uri selectedImage = data.getData();
-                try {
-                    imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
-                } catch (IOException e) {
-                    Log.e(TAG, "Error getting bitmap from gallery URI", e);
-                    Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            if (imageBitmap != null) {
-                profileButton.setImageBitmap(imageBitmap);
-                saveProfilePicture(imageBitmap);
-            }
-        }
-    }
-
     @Override
     protected int getLayoutResourceId() {
         return R.layout.activity_statistics;
@@ -648,4 +782,113 @@ public class StatisticsActivity extends BaseActivity {
                 usernameText.setText(username);
             });
     }
+
+    private void loadUserSurveys() {
+        Log.d(TAG, "loadUserSurveys: Attempting to load user surveys");
+        if (userId == null) {
+            Log.w(TAG, "loadUserSurveys: User ID is null, cannot load surveys.");
+            // Clear the adapter or show empty state if userId becomes null dynamically
+            if (userSurveysAdapter != null) {
+                 userSurveysAdapter.updateSurveys(new ArrayList<>());
+            }
+            return;
+        }
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String collectionPath = (currentUser == null) ? "non_authorized_users" : "users";
+
+        db.collection(collectionPath).document(userId).collection("user_surveys")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    Log.d(TAG, "loadUserSurveys: Successfully fetched user surveys.");
+
+                    List<Survey> userSurveys = new ArrayList<>();
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        Log.d(TAG, "loadUserSurveys: Found " + queryDocumentSnapshots.size() + " surveys.");
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            try {
+                                // Deserialize the full Survey object
+                                Log.d(TAG, "loadUserSurveys: Attempting to deserialize document: " + document.getId());
+                                Survey survey = document.toObject(Survey.class);
+                                if (survey != null) {
+                                    // Ensure the survey object has its ID set from the document ID
+                                    survey.setId(document.getId());
+                                    userSurveys.add(survey);
+                                    Log.d(TAG, "loadUserSurveys: Deserialized and added survey: " + survey.getTitle());
+                                } else {
+                                    Log.e(TAG, "loadUserSurveys: Deserialized survey object is null for document: " + document.getId());
+                                }
+                            } catch (Exception e) {
+                                Log.e(TAG, "loadUserSurveys: Error deserializing survey document: " + document.getId(), e);
+                            }
+                        }
+                    }
+
+                    if (userSurveys.isEmpty()) {
+                        Log.d(TAG, "loadUserSurveys: No surveys found for user.");
+                        // Handle no surveys case - maybe show a message in the RecyclerView or elsewhere
+                        // For now, the adapter will show an empty list.
+                        // You might want a dedicated TextView for this outside the RecyclerView.
+                        return;
+                    }
+
+                    // Initialize adapter if null, otherwise update
+                    if (userSurveysAdapter == null) {
+                        userSurveysAdapter = new UserSurveysAdapter(userSurveys, this);
+                        userSurveysRecyclerView.setAdapter(userSurveysAdapter);
+                    } else {
+                        userSurveysAdapter.updateSurveys(userSurveys);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "loadUserSurveys: Error fetching user surveys", e);
+                    // Handle error loading surveys
+                    Toast.makeText(this, "Error al cargar tus encuestas.", Toast.LENGTH_SHORT).show();
+                    if (userSurveysAdapter != null) {
+                         userSurveysAdapter.updateSurveys(new ArrayList<>()); // Clear list on error
+                    }
+                });
+    }
+
+    // Implementing the UserSurveysAdapter.OnSurveyActionsListener interface
+
+    @Override
+    public void onSurveyEditClick(Survey survey) {
+        Log.d(TAG, "onSurveyEditClick called for survey: " + survey.getTitle() + " (ID: " + survey.getId() + ")");
+        // Launch SurveyCreationActivity to edit the survey
+        Intent intent = new Intent(this, SurveyCreationActivity.class);
+        // Pass the survey ID to the creation activity so it can load the existing data
+        intent.putExtra("EDIT_SURVEY_ID", survey.getId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onSurveyAnswerClick(Survey survey) {
+        Log.d(TAG, "onSurveyAnswerClick called for survey: " + survey.getTitle() + " (ID: " + survey.getId() + ")");
+        // Launch SurveyActivity to answer the survey
+        Intent intent = new Intent(this, SurveyActivity.class);
+        intent.putExtra(SurveyActivity.EXTRA_SURVEY_ID, survey.getId());
+        intent.putExtra(SurveyActivity.EXTRA_SURVEY_TITLE, survey.getTitle());
+        intent.putExtra(SurveyActivity.EXTRA_SURVEY_DESCRIPTION, survey.getDescription());
+        intent.putExtra(SurveyActivity.EXTRA_SURVEY_EXPERIENCE, survey.getExperienceReward());
+        intent.putExtra(SurveyActivity.EXTRA_SURVEY_REQUIRED_LEVEL, survey.getRequiredLevel());
+        // Need to pass the questions as well - Survey object is Serializable
+        intent.putExtra(SurveyActivity.EXTRA_SURVEY_QUESTIONS, (ArrayList<com.lehikos.appencuestas.models.Question>) survey.getQuestions());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onSurveyViewStatsClick(Survey survey) {
+        Log.d(TAG, "onSurveyViewStatsClick called for survey: " + survey.getTitle() + " (ID: " + survey.getId() + ")");
+        // TODO: Implement logic to view survey statistics
+        Toast.makeText(this, "View Stats clicked for: " + survey.getTitle(), Toast.LENGTH_SHORT).show();
+    }
+
+    // Optional: Implement if the whole item view is clickable
+    // @Override
+    // public void onSurveyClick(Survey survey) {
+    //     Log.d(TAG, "onSurveyClick called for survey: " + survey.getTitle() + " (ID: " + survey.getId() + ")");
+    //     // Default action for clicking the item if not handled by buttons
+    //     // Maybe view stats or open a detail screen
+    // }
 }

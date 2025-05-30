@@ -14,6 +14,10 @@ import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.inputmethod.InputMethodManager;
+import android.content.Context;
+import android.graphics.Rect;
+import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FieldValue;
 import com.lehikos.appencuestas.R;
 import com.lehikos.appencuestas.RewardManager;
 import com.lehikos.appencuestas.firebase.FirestoreService;
@@ -32,7 +37,9 @@ import com.lehikos.appencuestas.models.Survey;
 import com.lehikos.appencuestas.models.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class SurveyActivity extends AppCompatActivity {
@@ -43,6 +50,8 @@ public class SurveyActivity extends AppCompatActivity {
     public static final String EXTRA_SURVEY_REQUIRED_LEVEL = "survey_required_level";
     public static final String EXTRA_SURVEY_QUESTIONS = "survey_questions";
 
+    private static final String TAG = "SurveyActivity";
+
     private RecyclerView questionsRecyclerView;
     private TextView surveyTitleText;
     private TextView surveyDescriptionText;
@@ -52,12 +61,58 @@ public class SurveyActivity extends AppCompatActivity {
     private RewardManager rewardManager;
     private SurveyQuestionsAdapter questionsAdapter;
     private FirestoreService firestoreService;
+    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("SurveyActivity", "onCreate started");
+        Log.d(TAG, "onCreate iniciado");
         super.onCreate(savedInstanceState);
+
+        // Hide the action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+             Log.d("SurveyActivity", "ActionBar hidden");
+        }
+
         setContentView(R.layout.activity_survey);
+
+        // Get the root view of the activity
+        rootView = findViewById(android.R.id.content);
+
+        // Add a GlobalLayoutListener to detect keyboard visibility changes
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            private int previousHeight;
+            private final float density = getResources().getDisplayMetrics().density; // Get screen density
+            private final int MIN_KEYBOARD_HEIGHT_PX = (int)(100 * density); // Minimum keyboard height threshold in pixels (e.g., 100dp)
+
+            @Override
+            public void onGlobalLayout() {
+                Rect r = new Rect();
+                // r will be populated with the coordinates of your view that are visible on screen.
+                rootView.getWindowVisibleDisplayFrame(r);
+
+                int currentHeight = r.bottom - r.top;
+                int heightDiff = rootView.getRootView().getHeight() - currentHeight;
+
+                // Check if the keyboard was just hidden
+                if (previousHeight != 0 && currentHeight > previousHeight && heightDiff < MIN_KEYBOARD_HEIGHT_PX) {
+                    Log.d("SurveyActivity", "Keyboard likely hidden. Current height: " + currentHeight + ", Previous height: " + previousHeight);
+                    // Check if an EditText is currently focused
+                    View focusedView = getCurrentFocus();
+                    if (focusedView instanceof EditText) {
+                        Log.d("SurveyActivity", "Unfocusing EditText after keyboard hidden.");
+                        focusedView.clearFocus();
+                        // Optional: Hide the keyboard explicitly again (though it should be hidden already)
+                        // InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        // if (imm != null) {
+                        //     imm.hideSoftInputFromWindow(focusedView.getWindowToken(), 0);
+                        // }
+                    }
+                }
+                previousHeight = currentHeight;
+            }
+        });
 
         firestoreService = new FirestoreService();
 
@@ -110,6 +165,26 @@ public class SurveyActivity extends AppCompatActivity {
         }
 
         submitButton.setOnClickListener(v -> submitSurvey());
+
+        // Log received XP
+        Log.d("SurveyActivity", "Received Experience Reward: " + experience);
+    }
+
+    // Override onBackPressed to unfocus EditText and hide keyboard
+    @Override
+    public void onBackPressed() {
+        View focusedView = getCurrentFocus();
+        if (focusedView instanceof EditText) {
+            Log.d("SurveyActivity", "Back button pressed, unfocusing EditText and hiding keyboard.");
+            focusedView.clearFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(focusedView.getWindowToken(), 0);
+            }
+        } else {
+            Log.d("SurveyActivity", "Back button pressed, no EditText focused, performing default back action.");
+            super.onBackPressed(); // Perform default back action
+        }
     }
 
     private List<Answer> collectAnswersFromAdapter() {
@@ -236,21 +311,71 @@ public class SurveyActivity extends AppCompatActivity {
                     }
                     User user = documentSnapshot.toObject(User.class);
                     if (user != null) {
-                        user.addExperience(currentSurvey.getExperienceReward());
-                        user.incrementSurveys();
-                        // Asegúrate de que user.toMap() esté implementado en tu clase User
+                        // Use FieldValue.increment for atomic updates
+                        Map<String, Object> updates = new HashMap<>();
+                        updates.put("experience", FieldValue.increment(currentSurvey.getExperienceReward()));
+                        updates.put("totalSurveys", FieldValue.increment(1));
+
                         db.collection(collection).document(userId)
-                                .set(user.toMap())
+                                .update(updates)
                                 .addOnSuccessListener(aVoid -> {
-                                    Log.d("SurveyActivity", "User data (XP) updated successfully in Firebase.");
-                                    rewardManager.addExperience(currentSurvey.getExperienceReward());
-                                    Log.d("SurveyActivity", "Local experience awarded: " + currentSurvey.getExperienceReward());
-                                    finalizeSurveyActivity(true);
+                                    Log.d(TAG, "User data (XP) updated successfully in Firebase.");
+
+                                    // Fetch the updated user document to get the new level
+                                    db.collection(collection).document(userId).get()
+                                            .addOnSuccessListener(updatedDocumentSnapshot -> {
+                                                if (updatedDocumentSnapshot.exists()) {
+                                                    User updatedUser = updatedDocumentSnapshot.toObject(User.class);
+                                                    if (updatedUser != null) {
+                                                        // Recalculate and save the level
+                                                        updatedUser.setExperience(updatedUser.getExperience()); // Calling setExperience triggers updateLevel()
+                                                        Map<String, Object> levelUpdate = new HashMap<>();
+                                                        levelUpdate.put("level", updatedUser.getLevel());
+
+                                                        db.collection(collection).document(userId).update(levelUpdate)
+                                                                .addOnSuccessListener(aVoid2 -> {
+                                                                    Log.d(TAG, "User level updated successfully in Firebase to: " + updatedUser.getLevel());
+                                                                    // Continue with local updates and finalization
+                                                                    rewardManager.addExperience(currentSurvey.getExperienceReward());
+                                                                    Log.d(TAG, "Local experience awarded: " + currentSurvey.getExperienceReward());
+                                                                    finalizeSurveyActivity(true);
+                                                                })
+                                                                .addOnFailureListener(e2 -> {
+                                                                    Log.e(TAG, "Error updating user level in Firebase.", e2);
+                                                                    // Finalize even if level update fails, rely on next load to fix
+                                                                    rewardManager.addExperience(currentSurvey.getExperienceReward());
+                                                                    Log.d(TAG, "Local experience awarded: (level update failed)" + currentSurvey.getExperienceReward());
+                                                                    finalizeSurveyActivity(false);
+                                                                });
+                                                    } else {
+                                                        Log.e(TAG, "Updated user object is null after Firestore deserialization.");
+                                                        // Finalize, indicating a partial failure
+                                                        rewardManager.addExperience(currentSurvey.getExperienceReward());
+                                                        Log.d(TAG, "Local experience awarded: (deserialization failed)" + currentSurvey.getExperienceReward());
+                                                        finalizeSurveyActivity(false);
+                                                    }
+                                                } else {
+                                                    Log.e(TAG, "User document not found after XP update.");
+                                                    // Finalize, indicating a partial failure
+                                                    rewardManager.addExperience(currentSurvey.getExperienceReward());
+                                                    Log.d(TAG, "Local experience awarded: (document not found)" + currentSurvey.getExperienceReward());
+                                                    finalizeSurveyActivity(false);
+                                                }
+                                            })
+                                            .addOnFailureListener(e2 -> {
+                                                Log.e(TAG, "Error fetching updated user document after XP update.", e2);
+                                                // Finalize, indicating a partial failure
+                                                rewardManager.addExperience(currentSurvey.getExperienceReward());
+                                                Log.d(TAG, "Local experience awarded: (fetch error)" + currentSurvey.getExperienceReward());
+                                                finalizeSurveyActivity(false);
+                                            });
+
                                 })
                                 .addOnFailureListener(e -> {
-                                    Log.e("SurveyActivity", "Error updating user data in Firebase.", e);
-                                    Toast.makeText(this, R.string.error_saving_user_data, Toast.LENGTH_SHORT).show();
-                                    finalizeSurveyActivity(false);
+                                    Log.e(TAG, "Error al actualizar user data (XP) en Firebase.", e);
+                                    Toast.makeText(SurveyActivity.this, "Failed to update user experience: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                    submitButton.setEnabled(true);
+                                    finalizeSurveyActivity(false); // Indicate failure
                                 });
                     } else {
                         Log.e("SurveyActivity", "User object is null after Firestore deserialization. UserID: " + userId);
@@ -315,7 +440,7 @@ public class SurveyActivity extends AppCompatActivity {
                     return false;
                 }
 
-                String questionTypeStr = question.getType();
+                String questionTypeStr = question.getType().name();
                 if (questionTypeStr == null) {
                     Log.w("SurveyQuestionsAdapter", "areAllQuestionsAnswered: Null question type for question: " + question.getText());
                     return false;
@@ -352,7 +477,7 @@ public class SurveyActivity extends AppCompatActivity {
         @Override
         public QuestionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_survey_question, parent, false);
+                    .inflate(R.layout.item_survey_question_view, parent, false);
             return new QuestionViewHolder(view);
         }
 
@@ -367,9 +492,10 @@ public class SurveyActivity extends AppCompatActivity {
 
             holder.ratingBar.setVisibility(View.GONE);
             holder.radioGroup.setVisibility(View.GONE);
+            holder.textInputLayout.setVisibility(View.GONE);
             holder.textInput.setVisibility(View.GONE);
 
-            String questionTypeStr = question.getType();
+            String questionTypeStr = question.getType().name();
             if (questionTypeStr == null) {
                 Log.e("SurveyQuestionsAdapter", "onBindViewHolder: Question type is null for: " + question.getText());
                 return;
@@ -404,6 +530,8 @@ public class SurveyActivity extends AppCompatActivity {
                             holder.radioGroup.addView(radioButton);
                             if (storedChoiceIndex instanceof Integer && ((Integer) storedChoiceIndex) == i) {
                                 radioButton.setChecked(true);
+                            } else {
+                                radioButton.setChecked(false);
                             }
                         }
                         holder.radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -418,9 +546,12 @@ public class SurveyActivity extends AppCompatActivity {
                                 }
                             }
                         });
+                    } else {
+                        Log.w("SurveyQuestionsAdapter", "onBindViewHolder: Options list is null for multiple choice question: " + question.getText());
                     }
                     break;
                 case "TEXT":
+                    holder.textInputLayout.setVisibility(View.VISIBLE);
                     holder.textInput.setVisibility(View.VISIBLE);
                     Object storedText = answers.get(position);
                     holder.textInput.setText(storedText instanceof String ? (String) storedText : "");
@@ -463,6 +594,7 @@ public class SurveyActivity extends AppCompatActivity {
             RatingBar ratingBar;
             RadioGroup radioGroup;
             EditText textInput;
+            View textInputLayout;
 
             QuestionViewHolder(View itemView) {
                 super(itemView);
@@ -470,7 +602,8 @@ public class SurveyActivity extends AppCompatActivity {
                 ratingBar = itemView.findViewById(R.id.rating_bar);
                 radioGroup = itemView.findViewById(R.id.radio_group);
                 textInput = itemView.findViewById(R.id.text_input);
+                textInputLayout = itemView.findViewById(R.id.text_input_layout);
             }
         }
-    } // End of SurveyQuestionsAdapter inner class
-} // End of SurveyActivity class
+    } 
+}

@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -35,13 +37,14 @@ public class LevelUpActivity extends BaseActivity {
     private MediaPlayer levelUpSound;
     private int gemReward;
     private boolean hasAwardedGems = false;
+    private int currentLevelShown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_level_up);
 
-        // Check if sound effects are enabled
+        // Verify if sound effects are enabled
         SharedPreferences prefs = getSharedPreferences(APP_PREFS, MODE_PRIVATE);
         boolean soundEffectsEnabled = prefs.getBoolean(SOUND_EFFECTS_ENABLED_KEY, true);
 
@@ -55,12 +58,12 @@ public class LevelUpActivity extends BaseActivity {
             levelUpSound.start();
         }
 
-        int level = getIntent().getIntExtra(EXTRA_LEVEL, 1);
+        currentLevelShown = getIntent().getIntExtra(EXTRA_LEVEL, 1);
         int experience = getIntent().getIntExtra(EXTRA_EXPERIENCE, 0);
         String nextReward = getIntent().getStringExtra(EXTRA_NEXT_REWARD);
 
         // Calculate gem reward based on level
-        gemReward = calculateGemReward(level);
+        gemReward = calculateGemReward(currentLevelShown);
 
         TextView titleText = findViewById(R.id.level_up_title);
         TextView messageText = findViewById(R.id.level_up_message);
@@ -68,7 +71,7 @@ public class LevelUpActivity extends BaseActivity {
         TextView tapToContinueText = findViewById(R.id.level_up_tap_to_continue);
         TextView gemRewardText = findViewById(R.id.gem_reward_text);
 
-        titleText.setText(getString(R.string.level_up_title, level));
+        titleText.setText(getString(R.string.level_up_title, currentLevelShown));
         messageText.setText(getString(R.string.level_up_message, experience));
         gemRewardText.setText("+" + gemReward);
         
@@ -80,7 +83,7 @@ public class LevelUpActivity extends BaseActivity {
 
         tapToContinueText.setText(R.string.level_up_tap_to_continue);
 
-        // Cerrar actividad al tocar
+        // Close activity on tap
         View rootView = findViewById(android.R.id.content);
         rootView.setOnClickListener(v -> {
             if (!hasAwardedGems) {
@@ -88,6 +91,10 @@ public class LevelUpActivity extends BaseActivity {
                 showGemParticlesAnimation();
                 hasAwardedGems = true;
             } else {
+                // Set result before finishing
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra(EXTRA_LEVEL, currentLevelShown);
+                setResult(Activity.RESULT_OK, resultIntent);
                 finish();
             }
         });
@@ -132,7 +139,7 @@ public class LevelUpActivity extends BaseActivity {
         gemText.setTextColor(getResources().getColor(R.color.accent_color));
         gemText.setTextSize(20);
         
-        // Add gem text to parent view
+        // Add gem text to the parent view
         parent.addView(gemText);
         
         // Position gem text

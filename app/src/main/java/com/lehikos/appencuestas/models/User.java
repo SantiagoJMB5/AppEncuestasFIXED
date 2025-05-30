@@ -12,21 +12,21 @@ public class User {
     private int level;
     private int totalSurveys;
 
-    // Experience required for each level (can be adjusted)
-    private static final int[] EXPERIENCE_PER_LEVEL = {
-        0,      // Level 1
-        100,    // Level 2
-        250,    // Level 3
-        500,    // Level 4
-        1000,   // Level 5
-        2000,   // Level 6
-        4000,   // Level 7
-        8000,   // Level 8
-        16000,  // Level 9
-        32000   // Level 10
+    // Experiencia requerida para cada nivel (puede ser ajustada)
+    public static final int[] EXPERIENCE_PER_LEVEL = {
+        0,      // Nivel 1
+        100,    // Nivel 2
+        250,    // Nivel 3
+        500,    // Nivel 4
+        1000,   // Nivel 5
+        2000,   // Nivel 6
+        4000,   // Nivel 7
+        8000,   // Nivel 8
+        16000,  // Nivel 9
+        32000   // Nivel 10
     };
 
-    // Empty constructor for Firestore
+    // Constructor vacío para Firestore
     public User() {}
 
     public User(String id, String username, int experience, int level, int totalSurveys) {

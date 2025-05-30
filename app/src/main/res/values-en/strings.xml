@@ -253,4 +253,56 @@
     <string name="shop_item_frame3_title">Legendary Frame</string>
     <string name="shop_item_frame3_description">An exclusive legendary frame</string>
 
+    <!-- Survey Creation -->
+    <string name="create_survey">Create Survey</string>
+    <string name="survey_creation_tutorial_title">Survey Creation Tutorial</string>
+    <string name="survey_creation_tutorial_message">Learn how to create effective surveys</string>
+    <string name="survey_creation_tutorial_rating">Rating Questions: Allow users to rate on a scale</string>
+    <string name="survey_creation_tutorial_multiple">Multiple Choice: Offer predefined options to choose from</string>
+    <string name="survey_creation_tutorial_text">Text Questions: Allow open and detailed responses</string>
+    <string name="survey_creation_tutorial_tags">Tags: Help categorize and find surveys easily</string>
+    <string name="survey_creation_tutorial_continue">Continue</string>
+    <string name="survey_creation_level_required">You need to be level 2 to create surveys</string>
+
+    <!-- Survey Creation UI -->
+    <string name="survey_title_hint">Survey Title</string>
+    <string name="survey_description_hint">Survey Description</string>
+    <string name="add_question">Add Question</string>
+    <string name="question_text_hint">Write your question</string>
+    <string name="question_type">Question Type</string>
+    <string name="question_type_rating">Rating</string>
+    <string name="question_type_multiple">Multiple Choice</string>
+    <string name="question_type_text">Text</string>
+    <string name="add_option">Add option</string>
+    <string name="option_hint">Option</string>
+    <string name="add_tags">Add Tags</string>
+    <string name="tags_hint">Tags (comma separated)</string>
+    <string name="save_survey">Save Survey</string>
+    <string name="delete_question">Delete question</string>
+    <string name="survey_saved">Survey saved</string>
+    <string name="error_saving_survey">Error saving survey</string>
+    <string name="survey_title_required">Title is required</string>
+    <string name="survey_description_required">Description is required</string>
+    <string name="survey_questions_required">Add at least one question</string>
+    <string name="survey_tags_required">Add at least one tag</string>
+    <string name="question_type_required">Select a question type</string>
+
+    <!-- New strings for survey creation -->
+    <string name="anonymous_survey">Anonymous Survey</string>
+    <string name="question_mandatory">Mandatory Question</string>
+    <string name="question_optional">Optional Question</string>
+    <string name="remove_option">Remove option</string>
+    <string name="close_question">Close</string>
+    <string name="your_surveys">Your Surveys</string>
+
+    <!-- Strings for item_survey.xml and item_user_survey.xml -->
+    <string name="tags_label">Tags:</string>
+    <string name="edit_survey">Edit</string>
+    <string name="answer_survey">Answer</string>
+
+    <!-- Strings for User Surveys section -->
+    <string name="anonymous_label">Anonymous</string>
+    <string name="public_label">Public</string>
+    <string name="view_stats_button">View Stats</string>
+
 </resources>

@@ -55,4 +55,12 @@
     <color name="primary_color">#FF3700B3</color>
     <color name="text_color">#FF000000</color>
     <color name="secondary_text_color">#FF757575</color>
+
+    <color name="chip_background">#424242</color>
+    <color name="chip_background_dark">#424242</color>
+
+    <!-- Dark theme text colors -->
+    <color name="text_primary_dark">#E6E1E5</color>
+    <color name="text_secondary_dark">#CAC4D0</color>
+    <color name="primary_color_light">#B4A5FD</color>
 </resources>

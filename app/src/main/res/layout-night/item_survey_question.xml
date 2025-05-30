@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/card_background_dark">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,13 +20,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:hint="@string/question_text_hint">
+            android:hint="@string/question_text_hint"
+            app:boxStrokeColor="@color/teal_200"
+            app:hintTextColor="@color/teal_200">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/question_text_edit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text" />
+                android:inputType="text"
+                android:textColor="@color/white" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -42,13 +46,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:hint="@string/option_hint">
+                android:hint="@string/option_hint"
+                app:boxStrokeColor="@color/teal_200"
+                app:hintTextColor="@color/teal_200">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/option1_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:textColor="@color/white" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -58,13 +65,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:hint="@string/option_hint">
+                android:hint="@string/option_hint"
+                app:boxStrokeColor="@color/teal_200"
+                app:hintTextColor="@color/teal_200">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/option2_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:textColor="@color/white" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -73,7 +83,8 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/add_option" />
+                android:text="@string/add_option"
+                android:textColor="@color/teal_200" />
 
         </LinearLayout>
 
@@ -88,7 +99,8 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/delete_question" />
+                android:text="@string/delete_question"
+                android:textColor="@color/teal_200" />
 
         </LinearLayout>
 

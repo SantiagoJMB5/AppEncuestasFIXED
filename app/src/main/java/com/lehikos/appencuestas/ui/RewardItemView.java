@@ -94,16 +94,16 @@ public class RewardItemView extends MaterialCardView {
                     if(rewardManager.isRewardRemoved(getRewardKey())){
                         markRewardAsNotRemoved();
                         setVisibility(View.VISIBLE);
-                        Log.d(TAG, "onClick: Add reward " + getRewardKey());
+                        Log.d(TAG, "onClick: Añadir recompensa " + getRewardKey());
                     }else{
                         markRewardAsRemoved();
                         startSlideOutAnimation();
-                        Log.d(TAG, "onClick: Remove reward " + getRewardKey());
+                        Log.d(TAG, "onClick: Remover recompensa " + getRewardKey());
                     }
                 }else{
                     if(rewardManager.getRewardOrder(getRewardKey()) > 2){
                         if(currentLevel < rewardData.streakThreshold){
-                            Log.d(TAG, "onClick: Reward not unlocked yet " + getRewardKey());
+                            Log.d(TAG, "onClick: Recompensa aún no desbloqueada " + getRewardKey());
                             return;
                         }
                         startAnimation();
@@ -111,7 +111,7 @@ public class RewardItemView extends MaterialCardView {
                         setIcon(R.drawable.tick);
                     }else{
                         if(currentLevel < rewardData.streakThreshold){
-                            Log.d(TAG, "onClick: Reward not unlocked yet " + getRewardKey());
+                            Log.d(TAG, "onClick: Recompensa aún no desbloqueada " + getRewardKey());
                             return;
                         }
                         startAnimation();

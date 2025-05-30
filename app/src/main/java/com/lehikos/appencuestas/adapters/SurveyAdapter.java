@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder> {
-    private final OnSurveyClickListener listener; // Make listener final if set only in constructor
-    // Use ArrayList for easier manipulation with DiffUtil, or ensure your List type supports it
+    private final OnSurveyClickListener listener; // Hacer el listener final si solo se establece en el constructor
+    // Usar ArrayList para una manipulación más fácil con DiffUtil, o asegurarse de que el tipo List lo soporte
     private List<Survey> surveys;
 
     public interface OnSurveyClickListener {
@@ -25,7 +25,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
     }
 
     public SurveyAdapter(List<Survey> initialSurveys, OnSurveyClickListener listener) {
-        // Initialize with a new list to avoid modifying the original list passed in, if necessary
+        // Inicializar con una nueva lista para evitar modificar la lista original pasada, si es necesario
         this.surveys = new ArrayList<>(initialSurveys != null ? initialSurveys : new ArrayList<>());
         this.listener = listener;
     }
@@ -41,11 +41,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
     @Override
     public void onBindViewHolder(@NonNull SurveyViewHolder holder, int position) {
         Survey survey = surveys.get(position);
-        if (survey == null) return; // Basic null check for the survey object
+        if (survey == null) return; // Verificación básica de nulo para el objeto encuesta
 
         holder.titleText.setText(survey.getTitle());
         holder.descriptionText.setText(survey.getDescription());
-        // Consider adding a placeholder or handling null for experience reward if it can be optional
+        // Considerar agregar un marcador de posición o manejar nulo para la recompensa de experiencia si puede ser opcional
         holder.experienceText.setText(String.format("+%d XP", survey.getExperienceReward()));
 
         holder.itemView.setOnClickListener(v -> {
@@ -57,17 +57,17 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
 
     @Override
     public int getItemCount() {
-        return surveys != null ? surveys.size() : 0; // Null check for surveys list
+        return surveys != null ? surveys.size() : 0; // Verificación de nulo para la lista de encuestas
     }
 
     /**
-     * Updates the list of surveys displayed by the adapter using DiffUtil for efficient updates.
+     * Actualiza la lista de encuestas mostradas por el adaptador usando DiffUtil para actualizaciones eficientes.
      *
-     * @param newSurveys The new list of surveys to display.
+     * @param newSurveys La nueva lista de encuestas a mostrar.
      */
     public void updateSurveys(List<Survey> newSurveys) {
         if (newSurveys == null) {
-            newSurveys = new ArrayList<>(); // Ensure newSurveys is not null
+            newSurveys = new ArrayList<>(); // Asegurar que newSurveys no sea nulo
         }
 
         final SurveyDiffCallback diffCallback = new SurveyDiffCallback(this.surveys, newSurveys);
@@ -75,7 +75,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
 
         this.surveys.clear();
         this.surveys.addAll(newSurveys);
-        diffResult.dispatchUpdatesTo(this); // This efficiently updates the RecyclerView
+        diffResult.dispatchUpdatesTo(this); // Esto actualiza eficientemente el RecyclerView
     }
 
     static class SurveyViewHolder extends RecyclerView.ViewHolder {
@@ -85,7 +85,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
 
         SurveyViewHolder(View itemView) {
             super(itemView);
-            // Ensure these IDs match your R.layout.item_survey XML file
+            // Asegurarse de que estos IDs coincidan con su archivo XML R.layout.item_survey
             titleText = itemView.findViewById(R.id.survey_title);
             descriptionText = itemView.findViewById(R.id.survey_description);
             experienceText = itemView.findViewById(R.id.survey_experience);
@@ -93,8 +93,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
     }
 
     /**
-     * DiffUtil.Callback implementation for calculating differences between two lists of Surveys.
-     * This helps RecyclerView update efficiently.
+     * Implementación de DiffUtil.Callback para calcular diferencias entre dos listas de Encuestas.
+     * Esto ayuda a que RecyclerView se actualice eficientemente.
      */
     private static class SurveyDiffCallback extends DiffUtil.Callback {
         private final List<Survey> oldList;
@@ -116,33 +116,33 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         }
 
         /**
-         * Called by DiffUtil to decide whether two objects represent the same item.
-         * For example, if your items have unique IDs, this method should check their equality.
+         * Llamado por DiffUtil para decidir si dos objetos representan el mismo elemento.
+         * Por ejemplo, si sus elementos tienen IDs únicos, este método debería verificar su igualdad.
          */
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            // CRITICAL: Your Survey model needs a unique identifier (e.g., getId())
-            // for DiffUtil to work correctly.
+            // CRÍTICO: Su modelo Survey necesita un identificador único (por ejemplo, getId())
+            // para que DiffUtil funcione correctamente.
             return oldList.get(oldItemPosition).getId().equals(newList.get(newItemPosition).getId());
         }
 
         /**
-         * Called by DiffUtil only if areItemsTheSame() returns true to check whether
-         * the visual representation of an item has changed.
-         * This method is used to detect changes in item content.
+         * Llamado por DiffUtil solo si areItemsTheSame() devuelve true para verificar si
+         * la representación visual de un elemento ha cambiado.
+         * Este método se usa para detectar cambios en el contenido del elemento.
          */
         @Override
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
             Survey oldSurvey = oldList.get(oldItemPosition);
             Survey newSurvey = newList.get(newItemPosition);
-            // Compare all fields that affect the UI representation of the item.
-            // Using .equals() if implemented in Survey, or compare fields manually.
-            // For example:
+            // Comparar todos los campos que afectan la representación UI del elemento.
+            // Usando .equals() si está implementado en Survey, o comparar campos manualmente.
+            // Por ejemplo:
             return oldSurvey.getTitle().equals(newSurvey.getTitle()) &&
                     oldSurvey.getDescription().equals(newSurvey.getDescription()) &&
                     oldSurvey.getExperienceReward() == newSurvey.getExperienceReward();
-            // Add other relevant fields if they are displayed or affect the item's appearance.
-            // If your Survey class has a proper .equals() method, you could just use:
+            // Agregar otros campos relevantes si se muestran o afectan la apariencia del elemento.
+            // Si su clase Survey tiene un método .equals() apropiado, podría simplemente usar:
             // return oldSurvey.equals(newSurvey);
         }
     }

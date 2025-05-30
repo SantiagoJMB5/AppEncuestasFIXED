@@ -246,4 +246,54 @@
     <string name="all_rewards_claimed">¡Todas las recompensas reclamadas!</string>
     <string name="reward_icon_description">Icono de recompensa</string>
     <string name="reward_achieved_description">Recompensa lograda.</string>
+
+    <!-- Survey Creation -->
+    <string name="create_survey">Crear Encuesta</string>
+    <string name="survey_creation_tutorial_title">Tutorial de Creación de Encuestas</string>
+    <string name="survey_creation_tutorial_message">Aprende a crear encuestas efectivas</string>
+    <string name="survey_creation_tutorial_rating">Preguntas de Calificación: Permiten a los usuarios calificar en una escala</string>
+    <string name="survey_creation_tutorial_multiple">Preguntas Múltiples: Ofrecen opciones predefinidas para elegir</string>
+    <string name="survey_creation_tutorial_text">Preguntas de Texto: Permiten respuestas abiertas y detalladas</string>
+    <string name="survey_creation_tutorial_tags">Etiquetas: Ayudan a categorizar y encontrar encuestas fácilmente</string>
+    <string name="survey_creation_tutorial_continue">Continuar</string>
+    <string name="survey_creation_level_required">Necesitas ser nivel 2 para crear encuestas</string>
+
+    <!-- Survey Creation UI -->
+    <string name="survey_title_hint">Título de la encuesta</string>
+    <string name="survey_description_hint">Descripción de la encuesta</string>
+    <string name="add_question">Añadir Pregunta</string>
+    <string name="question_text_hint">Escribe tu pregunta</string>
+    <string name="question_type">Tipo de Pregunta</string>
+    <string name="question_type_rating">Calificación</string>
+    <string name="question_type_multiple">Opción múltiple</string>
+    <string name="question_type_text">Texto</string>
+    <string name="add_option">Añadir opción</string>
+    <string name="option_hint">Opción</string>
+    <string name="add_tags">Añadir Etiquetas</string>
+    <string name="tags_hint">Etiquetas (separadas por comas)</string>
+    <string name="save_survey">Guardar Encuesta</string>
+    <string name="delete_question">Eliminar pregunta</string>
+    <string name="survey_saved">Encuesta guardada</string>
+    <string name="error_saving_survey">Error al guardar la encuesta</string>
+    <string name="survey_title_required">El título es requerido</string>
+    <string name="survey_description_required">La descripción es requerida</string>
+    <string name="survey_questions_required">Añade al menos una pregunta</string>
+    <string name="survey_tags_required">Añade al menos una etiqueta</string>
+    <string name="question_type_required">Selecciona un tipo de pregunta</string>
+
+    <!-- New strings for survey creation -->
+    <string name="anonymous_survey">Encuesta anónima</string>
+    <string name="question_mandatory">Pregunta obligatoria</string>
+    <string name="question_optional">Pregunta opcional</string>
+    <string name="remove_option">Eliminar opción</string>
+    <string name="close_question">Cerrar</string>
+    <string name="your_surveys">Tus Encuestas</string>
+
+    <!-- Strings for item_survey.xml and item_user_survey.xml -->
+    <string name="tags_label">Etiquetas:</string>
+    <string name="edit_survey">Editar</string>
+    <string name="answer_survey">Responder</string>
+    <string name="anonymous_label">Anónima</string>
+    <string name="public_label">Pública</string>
+    <string name="view_stats_button">Ver Estadísticas</string>
 </resources>

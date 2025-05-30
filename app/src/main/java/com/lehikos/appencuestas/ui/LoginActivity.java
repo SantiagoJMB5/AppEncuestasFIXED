@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Configure Google Sign In
+        // Configurar inicio de sesión con Google
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -74,11 +74,11 @@ public class LoginActivity extends AppCompatActivity {
                         .build();
             }
         } catch (Exception e) {
-            Log.w(TAG, "Error getting client ID, proceeding without Google Sign-In", e);
+            Log.w(TAG, "Error al obtener el ID del cliente, continuando sin inicio de sesión con Google", e);
         }
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        // Initialize views
+        // Inicializar vistas
         editTextEmailLogin = findViewById(R.id.editTextEmailLogin);
         editTextPasswordLogin = findViewById(R.id.editTextPasswordLogin);
         buttonLogin = findViewById(R.id.buttonLogin);
@@ -90,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         buttonLightMode = findViewById(R.id.buttonLightMode);
         buttonDarkMode = findViewById(R.id.buttonDarkMode);
 
-        // Theme toggle logic
+        // Lógica de alternancia de tema
         String currentTheme = getSharedPreferences(APP_PREFS, MODE_PRIVATE).getString(THEME_KEY, "light");
         updateThemeToggleSelection(currentTheme);
 
@@ -179,16 +179,16 @@ public class LoginActivity extends AppCompatActivity {
                         if (user != null) {
                             String email = user.getEmail();
                             
-                            // Check if user document exists
+                            // Verificar si existe el documento del usuario
                             db.collection("users").document(user.getUid())
                                 .get()
                                 .addOnSuccessListener(documentSnapshot -> {
                                     if (!documentSnapshot.exists()) {
-                                        // Create new user document if it doesn't exist
+                                        // Crear nuevo documento de usuario si no existe
                                         Map<String, Object> userMap = new HashMap<>();
                                         userMap.put("id", user.getUid());
                                         userMap.put("email", email);
-                                        userMap.put("username", null); // Set username as null initially
+                                        userMap.put("username", null); // Establecer nombre de usuario como nulo inicialmente
                                         userMap.put("experience", 0);
                                         userMap.put("level", 1);
                                         userMap.put("totalSurveys", 0);
@@ -200,20 +200,20 @@ public class LoginActivity extends AppCompatActivity {
                                                 navigateToHome();
                                             })
                                             .addOnFailureListener(e -> {
-                                                Log.e(TAG, "Error creating new user document", e);
+                                                Log.e(TAG, "Error al crear documento de usuario", e);
                                                 Toast.makeText(LoginActivity.this, 
-                                                    "Error creating user profile", Toast.LENGTH_SHORT).show();
+                                                    "Error al crear perfil de usuario", Toast.LENGTH_SHORT).show();
                                             });
                                     } else {
-                                        // User document exists, proceed to home
+                                        // El documento de usuario existe, proceder a inicio
                                         setHasSeenLoginScreen();
                                         navigateToHome();
                                     }
                                 })
                                 .addOnFailureListener(e -> {
-                                    Log.e(TAG, "Error checking user document", e);
+                                    Log.e(TAG, "Error al verificar documento de usuario", e);
                                     Toast.makeText(LoginActivity.this, 
-                                        "Error checking user profile", Toast.LENGTH_SHORT).show();
+                                        "Error al verificar perfil de usuario", Toast.LENGTH_SHORT).show();
                                 });
                         }
                     } else {
@@ -223,14 +223,14 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void continueWithoutLogin() {
-        // Generate a unique ID for the non-authorized user
+        // Generar un ID único para el usuario no autorizado
         String nonAuthUserId = "user_" + System.currentTimeMillis();
         
-        // Save the ID in SharedPreferences
+        // Guardar el ID en SharedPreferences
         SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         prefs.edit().putString("non_authorized_user_id", nonAuthUserId).apply();
 
-        // Create a document in Firestore for the non-authorized user
+        // Crear un documento en Firestore para el usuario no autorizado
         db.collection("non_authorized_users").document(nonAuthUserId)
                 .set(new User(nonAuthUserId, "non_authorized_user", 0, 1, 0))
                 .addOnSuccessListener(aVoid -> {
@@ -238,8 +238,8 @@ public class LoginActivity extends AppCompatActivity {
                     navigateToHome();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error creating non-authorized user", e);
-                    Toast.makeText(LoginActivity.this, "Error creating temporary user", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error al crear usuario no autorizado", e);
+                    Toast.makeText(LoginActivity.this, "Error al crear usuario temporal", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -272,16 +272,16 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d(TAG, "signInWithEmail:success");
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
-                            // Check if user document exists
+                            // Verificar si existe el documento del usuario
                             db.collection("users").document(user.getUid())
                                 .get()
                                 .addOnSuccessListener(documentSnapshot -> {
                                     if (!documentSnapshot.exists()) {
-                                        // Create new user document if it doesn't exist
+                                        // Crear nuevo documento de usuario si no existe
                                         Map<String, Object> userMap = new HashMap<>();
                                         userMap.put("id", user.getUid());
                                         userMap.put("email", email);
-                                        userMap.put("username", null); // Set username as null initially
+                                        userMap.put("username", null); // Establecer nombre de usuario como nulo inicialmente
                                         userMap.put("experience", 0);
                                         userMap.put("level", 1);
                                         userMap.put("totalSurveys", 0);
@@ -290,27 +290,27 @@ public class LoginActivity extends AppCompatActivity {
                                             .set(userMap)
                                             .addOnSuccessListener(aVoid -> {
                                                 Toast.makeText(LoginActivity.this, 
-                                                    "Login Successful!", Toast.LENGTH_SHORT).show();
+                                                    "¡Inicio de sesión exitoso!", Toast.LENGTH_SHORT).show();
                                                 setHasSeenLoginScreen();
                                                 navigateToHome();
                                             })
                                             .addOnFailureListener(e -> {
-                                                Log.e(TAG, "Error creating user document", e);
+                                                Log.e(TAG, "Error al crear documento de usuario", e);
                                                 Toast.makeText(LoginActivity.this, 
-                                                    "Error creating user profile", Toast.LENGTH_SHORT).show();
+                                                    "Error al crear perfil de usuario", Toast.LENGTH_SHORT).show();
                                             });
                                     } else {
-                                        // User document exists, proceed to home
+                                        // El documento de usuario existe, proceder a inicio
                                         Toast.makeText(LoginActivity.this, 
-                                            "Login Successful!", Toast.LENGTH_SHORT).show();
+                                            "¡Inicio de sesión exitoso!", Toast.LENGTH_SHORT).show();
                                         setHasSeenLoginScreen();
                                         navigateToHome();
                                     }
                                 })
                                 .addOnFailureListener(e -> {
-                                    Log.e(TAG, "Error checking user document", e);
+                                    Log.e(TAG, "Error al verificar documento de usuario", e);
                                     Toast.makeText(LoginActivity.this, 
-                                        "Error checking user profile", Toast.LENGTH_SHORT).show();
+                                        "Error al verificar perfil de usuario", Toast.LENGTH_SHORT).show();
                                 });
                         }
                     } else {
@@ -332,46 +332,46 @@ public class LoginActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         
-        // Check if user has already seen the login screen
+        // Verificar si el usuario ya ha visto la pantalla de inicio de sesión
         SharedPreferences appPrefs = getSharedPreferences(APP_PREFS, MODE_PRIVATE);
         boolean hasSeenLoginScreen = appPrefs.getBoolean("hasSeenLoginScreen", false);
 
         if (hasSeenLoginScreen) {
-            // Check Firebase Auth state
+            // Verificar estado de autenticación de Firebase
             FirebaseUser currentUser = mAuth.getCurrentUser();
             if (currentUser != null) {
-                // User is signed in with Firebase, go to home
+                // El usuario ha iniciado sesión con Firebase, ir a inicio
                 navigateToHome();
                 return;
             }
 
-            // Check for non-authorized user
+            // Verificar usuario no autorizado
             SharedPreferences userPrefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             String nonAuthUserId = userPrefs.getString("non_authorized_user_id", null);
             if (nonAuthUserId != null) {
-                // Verify the non-authorized user still exists in Firestore
+                // Verificar que el usuario no autorizado aún existe en Firestore
                 db.collection("non_authorized_users").document(nonAuthUserId)
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
-                            // Non-authorized user exists, go to home
+                            // El usuario no autorizado existe, ir a inicio
                             navigateToHome();
                         } else {
-                            // Non-authorized user document was deleted, clear preferences
+                            // El documento del usuario no autorizado fue eliminado, limpiar preferencias
                             userPrefs.edit().remove("non_authorized_user_id").apply();
                             appPrefs.edit().remove("hasSeenLoginScreen").apply();
                         }
                     })
                     .addOnFailureListener(e -> {
-                        Log.e(TAG, "Error checking non-authorized user", e);
-                        // On error, stay on login screen
+                        Log.e(TAG, "Error al verificar usuario no autorizado", e);
+                        // En caso de error, permanecer en la pantalla de inicio de sesión
                     });
             }
         }
-        // If we get here, either:
-        // 1. User hasn't seen login screen before
-        // 2. No valid user state found
-        // In both cases, stay on login screen
+        // Si llegamos aquí, ya sea:
+        // 1. El usuario no ha visto la pantalla de inicio de sesión antes
+        // 2. No se encontró un estado de usuario válido
+        // En ambos casos, permanecer en la pantalla de inicio de sesión
     }
 
     private void setThemePreference(String themeName) {

@@ -40,6 +40,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+
 public class HomeActivity extends BaseActivity {
     private static final String TAG = "HomeActivity"; // Reintroducido para logging consistente
     private static final String APP_PREFS = "AppPrefs";
@@ -48,12 +55,13 @@ public class HomeActivity extends BaseActivity {
     private static final String MUSIC_ENABLED_KEY = "music_enabled";
     private static final String SOUND_EFFECTS_ENABLED_KEY = "sound_effects_enabled";
     private static final int REQUEST_CODE_SURVEY = 1; // Del nuevo código
+    private static final String TUTORIAL_SHOWN_KEY = "survey_creation_tutorial_shown";
 
     private RecyclerView recyclerView;
     private SurveyAdapter adapter;
     private List<Survey> surveys;
     private List<String> completedSurveyIds = new ArrayList<>(); // Del nuevo código
-
+    private FloatingActionButton createSurveyFab;
     private FirebaseAuth mAuth; // Reintroducido del original para logout y consistencia
 
     @Override
@@ -75,6 +83,10 @@ public class HomeActivity extends BaseActivity {
             // Inicializar Firestore y crear colecciones si no existen (del nuevo código)
             FirebaseInitializer.getInstance().initializeCollections();
             Log.d(TAG, "Colecciones de FirebaseInitializer inicializadas");
+
+            // Inicializar FAB
+            createSurveyFab = findViewById(R.id.create_survey_fab);
+            createSurveyFab.setOnClickListener(v -> handleCreateSurveyClick());
 
             recyclerView = findViewById(R.id.surveys_recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -221,7 +233,7 @@ public class HomeActivity extends BaseActivity {
             return;
         }
 
-        FirebaseUser currentUser = mAuth.getCurrentUser(); // Usar mAuth
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         String userId;
         String collectionPath;
 
@@ -238,17 +250,31 @@ public class HomeActivity extends BaseActivity {
             Log.e(TAG, "El ID de usuario es nulo. No se puede guardar la encuesta completada.");
             return;
         }
+
         // Añadir a la lista local primero para prevenir que se muestre de nuevo si la llamada a Firebase es lenta
         if (!completedSurveyIds.contains(surveyId)) {
             completedSurveyIds.add(surveyId);
+            
+            // Guardar en SharedPreferences inmediatamente
+            SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            String json = new Gson().toJson(completedSurveyIds);
+            prefs.edit().putString("completed_surveys", json).apply();
+            
+            Log.d(TAG, "Encuesta " + surveyId + " añadida a la lista local y guardada en SharedPreferences");
         }
-
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection(collectionPath).document(userId)
                 .update("completed_surveys", FieldValue.arrayUnion(surveyId))
-                .addOnSuccessListener(aVoid -> Log.d(TAG, "Encuesta " + surveyId + " marcada como completada para el usuario " + userId))
-                .addOnFailureListener(e -> Log.e(TAG, "Error al marcar la encuesta " + surveyId + " como completada para el usuario " + userId, e));
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Encuesta " + surveyId + " marcada como completada para el usuario " + userId);
+                    // Actualizar la vista para reflejar el cambio
+                    displaySurveys();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error al marcar la encuesta " + surveyId + " como completada para el usuario " + userId, e);
+                    // Si falla Firebase, al menos tenemos la copia local
+                });
     }
 
 
@@ -580,29 +606,47 @@ public class HomeActivity extends BaseActivity {
             return;
         }
 
+        // Primero intentar cargar desde SharedPreferences como caché
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String completedSurveysJson = prefs.getString("completed_surveys", null);
+        if (completedSurveysJson != null) {
+            try {
+                Type type = new TypeToken<List<String>>(){}.getType();
+                List<String> cachedCompleted = new Gson().fromJson(completedSurveysJson, type);
+                if (cachedCompleted != null) {
+                    this.completedSurveyIds = new ArrayList<>(cachedCompleted);
+                    Log.d(TAG, "Cargadas " + completedSurveyIds.size() + " IDs de encuestas completadas desde caché");
+                    displaySurveys(); // Mostrar encuestas filtradas inmediatamente
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error al cargar encuestas completadas desde caché", e);
+            }
+        }
+
+        // Luego actualizar desde Firebase
         FirebaseFirestore.getInstance().collection(collectionPath).document(userId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot != null && documentSnapshot.exists()) {
                         List<String> completed = (List<String>) documentSnapshot.get("completed_surveys");
                         if (completed != null) {
                             this.completedSurveyIds = new ArrayList<>(completed); // Crear nueva lista
-                            Log.d(TAG, "Cargadas " + completedSurveyIds.size() + " IDs de encuestas completadas para el usuario: " + userId);
+                            Log.d(TAG, "Cargadas " + completedSurveyIds.size() + " IDs de encuestas completadas desde Firebase para el usuario: " + userId);
+                            
+                            // Guardar en caché
+                            String json = new Gson().toJson(completedSurveyIds);
+                            prefs.edit().putString("completed_surveys", json).apply();
+                            
+                            displaySurveys(); // Actualizar la vista con las encuestas filtradas
                         } else {
                             this.completedSurveyIds = new ArrayList<>();
                             Log.d(TAG, "No se encontró el campo 'completed_surveys' para el usuario: " + userId + ". Inicializando como vacía.");
+                            displaySurveys();
                         }
                     } else {
                         this.completedSurveyIds = new ArrayList<>();
                         Log.d(TAG, "No se encontró documento para el usuario: " + userId + " en " + collectionPath + ". Inicializando encuestas completadas como vacía.");
-                        // Si es un non_authorized_user y el documento no existe, algo salió mal con su creación
-                        if ("non_authorized_users".equals(collectionPath) && mAuth.getCurrentUser() == null) {
-                            Log.w(TAG, "Documento de usuario no autorizado ausente. Intentando recrear.");
-                            getSharedPreferences("UserPrefs", MODE_PRIVATE).edit().remove("non_authorized_user_id").apply();
-                            checkAndCreateNonAuthorizedUser(); // Esto re-disparará el flujo
-                            return; // Evitar llamar a displaySurveys dos veces
-                        }
-                    }
                     displaySurveys();
+                    }
             })
             .addOnFailureListener(e -> {
                     Log.e(TAG, "Error al cargar encuestas completadas para el usuario: " + userId, e);
@@ -849,6 +893,7 @@ public class HomeActivity extends BaseActivity {
         // Si las encuestas no se muestran correctamente, podría ser necesario llamar a loadCompletedSurveysAndDisplay() aquí también.
         // Sin embargo, tener cuidado con cargas múltiples.
         setSelectedNavigationItem(R.id.navigation_home);
+        updateCreateSurveyFabVisibility();
     }
 
     @Override
@@ -966,5 +1011,72 @@ public class HomeActivity extends BaseActivity {
                 SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                 prefs.edit().putString("user_username", username).apply();
             });
+    }
+
+    // Método para manejar el clic en el FAB de creación de encuestas
+    private void handleCreateSurveyClick() {
+        // Verificar si el tutorial ya se ha mostrado
+        SharedPreferences prefs = getSharedPreferences(APP_PREFS, MODE_PRIVATE);
+        boolean tutorialShown = prefs.getBoolean(TUTORIAL_SHOWN_KEY, false);
+
+        if (!tutorialShown) {
+            showSurveyCreationTutorial();
+        } else {
+            startActivity(new Intent(this, SurveyCreationActivity.class));
+        }
+    }
+
+    // Método para mostrar el tutorial de creación de encuestas
+    private void showSurveyCreationTutorial() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.survey_creation_tutorial_title)
+               .setMessage(getString(R.string.survey_creation_tutorial_message) + "\n\n" +
+                         getString(R.string.survey_creation_tutorial_rating) + "\n\n" +
+                         getString(R.string.survey_creation_tutorial_multiple) + "\n\n" +
+                         getString(R.string.survey_creation_tutorial_text) + "\n\n" +
+                         getString(R.string.survey_creation_tutorial_tags))
+               .setPositiveButton(R.string.survey_creation_tutorial_continue, (dialog, which) -> {
+                   // Marcar el tutorial como mostrado
+                   SharedPreferences prefs = getSharedPreferences(APP_PREFS, MODE_PRIVATE);
+                   prefs.edit().putBoolean(TUTORIAL_SHOWN_KEY, true).apply();
+                   startActivity(new Intent(this, SurveyCreationActivity.class));
+               })
+               .setCancelable(false)
+               .show();
+    }
+
+    // Método para actualizar la visibilidad del FAB basado en el nivel del usuario
+    private void updateCreateSurveyFabVisibility() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        String userId;
+        String collection;
+
+        if (currentUser != null) {
+            userId = currentUser.getUid();
+            collection = "users";
+        } else {
+            SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            userId = prefs.getString("non_authorized_user_id", null);
+            collection = "non_authorized_users";
+        }
+
+        if (userId != null) {
+            FirebaseFirestore.getInstance().collection(collection).document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Long level = documentSnapshot.getLong("level");
+                        if (level != null && level >= 2) {
+                            createSurveyFab.setVisibility(View.VISIBLE);
+                        } else {
+                            createSurveyFab.setVisibility(View.GONE);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error checking user level", e);
+                    createSurveyFab.setVisibility(View.GONE);
+                });
+        }
     }
 } 

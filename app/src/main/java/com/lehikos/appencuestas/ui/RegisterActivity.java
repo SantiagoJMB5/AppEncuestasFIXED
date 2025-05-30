@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar; // Optional: for loading indication
+import android.widget.ProgressBar; // Opcional: para indicación de carga
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -42,7 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
         editTextConfirmPasswordRegister = findViewById(R.id.editTextConfirmPasswordRegister);
         buttonRegister = findViewById(R.id.buttonRegister);
         textViewGoToLogin = findViewById(R.id.textViewGoToLogin);
-        // progressBar = findViewById(R.id.progressBarRegister); // Add ProgressBar to your XML if you use this
+        // progressBar = findViewById(R.id.progressBarRegister); // Agregar ProgressBar a tu XML si usas esto
 
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,25 +96,25 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // if (progressBar != null) progressBar.setVisibility(View.VISIBLE); // Show progress bar
+        // if (progressBar != null) progressBar.setVisibility(View.VISIBLE); // Mostrar barra de progreso
 
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        // if (progressBar != null) progressBar.setVisibility(View.GONE); // Hide progress bar
+                        // if (progressBar != null) progressBar.setVisibility(View.GONE); // Ocultar barra de progreso
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
+                            // Registro exitoso, actualizar UI con la información del usuario registrado
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(RegisterActivity.this, getString(R.string.registration_successful), Toast.LENGTH_SHORT).show();
-                            // You can optionally send a verification email here
+                            // Opcionalmente puedes enviar un correo de verificación aquí
                             // user.sendEmailVerification();
-                            // Navigate to Login screen or directly to Home screen
+                            // Navegar a la pantalla de inicio de sesión o directamente a la pantalla de inicio
                             startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
-                            finishAffinity(); // Finish this activity and all parent activities
+                            finishAffinity(); // Finalizar esta actividad y todas las actividades padre
                         } else {
-                            // If sign in fails, display a message to the user.
+                            // Si el registro falla, mostrar un mensaje al usuario
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(RegisterActivity.this, getString(R.string.authentication_failed, task.getException().getMessage()),
                                     Toast.LENGTH_LONG).show();

@@ -54,6 +54,11 @@
         <activity
             android:name=".ui.LevelUpActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.SurveyCreationActivity"
+            android:exported="false"
+            android:label="@string/create_survey"
+            android:theme="@style/Theme.AppEncuestas" />
     </application>
 
 </manifest>

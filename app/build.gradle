@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.lehikos.appencuestas"
-        minSdk 26
+        minSdk 24
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -26,8 +26,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        viewBinding true
     }
 }
 
@@ -40,6 +44,9 @@ dependencies {
 
     // Google Sign In
     implementation 'com.google.android.gms:play-services-auth:20.7.0'
+
+    // Gson for JSON serialization
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     // AndroidX Core
     implementation 'androidx.core:core:1.12.0'
